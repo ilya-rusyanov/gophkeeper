@@ -7,12 +7,14 @@ import (
 	"time"
 )
 
+// Server is an HTTP server
 type Server struct {
 	server    *http.Server
 	errorChan chan error
 }
 
-func New(listenAddr string, handler http.Handler) *Server {
+// New constructs HTTP server
+func New(listenAddr string, handler http.Handler, opts ...Opt) *Server {
 	res := &Server{
 		server: &http.Server{
 			Addr:    listenAddr,
@@ -21,18 +23,30 @@ func New(listenAddr string, handler http.Handler) *Server {
 		errorChan: make(chan error, 1),
 	}
 
+	// apply options
+	for _, opt := range opts {
+		opt(res.server)
+	}
+
 	go func() {
-		res.errorChan <- res.server.ListenAndServe()
+		if res.server.TLSConfig == nil {
+			res.errorChan <- res.server.ListenAndServe()
+		} else {
+			res.errorChan <- res.server.ListenAndServeTLS("", "")
+		}
+
 		close(res.errorChan)
 	}()
 
 	return res
 }
 
+// Error supplies server errors
 func (s *Server) Error() <-chan error {
 	return s.errorChan
 }
 
+// Stop interrupts server
 func (s *Server) Stop(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()

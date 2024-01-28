@@ -21,7 +21,11 @@ func main() {
 
 	r := chi.NewRouter()
 
-	httpServer := httpserver.New(config.ListenAddr, r)
+	var srvOpts []httpserver.Opt
+	if config.Secure {
+		srvOpts = append(srvOpts, httpserver.GenerateCert())
+	}
+	httpServer := httpserver.New(config.ListenAddr, r, srvOpts...)
 
 	done := shutdown.Wait(ctx, logger, httpServer)
 
