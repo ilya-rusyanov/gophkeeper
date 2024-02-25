@@ -37,7 +37,6 @@ func New(
 		return nil, fmt.Errorf("failed to start listener: %w", err)
 	}
 
-	logger.Infof("hello")
 	res.server = grpc.NewServer()
 
 	proto.RegisterGophkeeperServer(res.server, service)
