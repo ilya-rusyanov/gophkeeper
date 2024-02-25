@@ -8,3 +8,8 @@ func New(serverAddr string) *GophKeeperGW {
 	// TODO: implement actual constructor
 	return &GophKeeperGW{}
 }
+
+func (gk *GophKeeperGW) Register(login, password string) error {
+	// TODO
+	return nil
+}

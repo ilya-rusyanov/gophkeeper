@@ -1,25 +1,61 @@
 package register
 
+import "fmt"
+
+type GenericError struct {
+	orig error
+}
+
+func NewGenericError(orig error) *GenericError {
+	return &GenericError{
+		orig: orig,
+	}
+}
+
+func (e *GenericError) Error() string {
+	return "generic error: " + e.orig.Error()
+}
+
 // CredentialsStorager represents storage of credentials
-type CredentialsStorager interface{}
+type CredentialsStorager interface {
+	Store(login, password string) error
+}
 
 // Servicer is remote service
-type Servicer interface{}
+type Servicer interface {
+	Register(login, password string) error
+}
 
 // Register is UC for user registration on server
-type Register struct{}
+type Register struct {
+	service Servicer
+	storage CredentialsStorager
+}
 
 // New constructs UC
 func New(
 	credStorage CredentialsStorager,
 	service Servicer,
 ) *Register {
-	// TODO: implement constructor logic
-	return &Register{}
+	return &Register{
+		service: service,
+		storage: credStorage,
+	}
 }
 
 // Register performs user registration
 func (r *Register) Register(login, password string) error {
-	// TODO: implement logic
+	if err := r.service.Register(login, password); err != nil {
+		return NewGenericError(
+			fmt.Errorf("server error: %w", err),
+		)
+	}
+
+	if err := r.storage.Store(login, password); err != nil {
+		return NewGenericError(
+			fmt.Errorf("credentials storage error: %w", err),
+		)
+	}
+
 	return nil
 }

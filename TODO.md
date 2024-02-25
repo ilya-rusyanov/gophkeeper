@@ -1,7 +1,5 @@
 # TODO
 
-- [ ] client register usecase test
-- [ ] client register usecase
 - [ ] client usercred storage impl
 - [ ] client server gateway
 - [ ] client controller impl
@@ -11,4 +9,6 @@
 
 ## Done
 
+- [ ] client register usecase
+- [ ] client register usecase test
 - [ ] client stub is buildable

@@ -8,3 +8,8 @@ func New(usernameFilename, appName string) *UserCred {
 	// TODO: implement actual storage
 	return &UserCred{}
 }
+
+func (c *UserCred) Store(login, password string) error {
+	// TODO
+	return nil
+}
