@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] client usercred storage impl
 - [ ] client server gateway
 - [ ] client controller impl
 - [ ] logger
@@ -9,6 +8,7 @@
 
 ## Done
 
+- [ ] client usercred store impl
 - [ ] client controller register impl
 - [ ] server grpc service
 - [ ] server stub
