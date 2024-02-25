@@ -9,6 +9,7 @@
 
 ## Done
 
+- [ ] client controller register impl
 - [ ] server grpc service
 - [ ] server stub
 - [ ] design server

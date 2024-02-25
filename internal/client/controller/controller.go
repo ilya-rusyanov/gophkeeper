@@ -2,6 +2,9 @@ package controller
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/alecthomas/kong"
 )
 
 // Registerer is registration domain
@@ -11,15 +14,19 @@ type Registerer interface {
 
 // Controller is user controller for interaction with the application
 type Controller struct {
-	register Registerer
+	ctx *kong.Context
+	cli struct {
+		Register RegisterCmd `cmd:"" help:"Register user"`
+	}
 }
 
 // Opt is a funcopt
 type Opt func(*Controller)
 
+// WithRegister specifies Register UC
 func WithRegister(r Registerer) Opt {
 	return func(c *Controller) {
-		c.register = r
+		c.cli.Register.uc = r
 	}
 }
 
@@ -31,11 +38,16 @@ func New(opts ...Opt) *Controller {
 		o(&res)
 	}
 
+	res.ctx = kong.Parse(&res.cli)
+
 	return &res
 }
 
+// Run starts the controller
 func (c *Controller) Run(ctx context.Context) error {
-	// TODO: implement Run logic
+	if err := c.ctx.Run(); err != nil {
+		return fmt.Errorf("context error: %w", err)
+	}
 
 	return nil
 }
