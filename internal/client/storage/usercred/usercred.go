@@ -21,13 +21,13 @@ func New(log Logger, usernameFilename, appName string) *UserCred {
 	return &UserCred{
 		appName:          appName,
 		userNameFileName: usernameFilename,
-		log: log,
+		log:              log,
 	}
 }
 
 // Store saves login and password
 func (c *UserCred) Store(login, password string) error {
-	err := os.WriteFile(c.userNameFileName, []byte(login), 0o600)
+	err := os.WriteFile(c.userNameFileName, []byte(login), 0666)
 	if err != nil {
 		return fmt.Errorf("failed to write login file: %w", err)
 	}
