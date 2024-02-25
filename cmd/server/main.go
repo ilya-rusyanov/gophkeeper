@@ -8,6 +8,7 @@ import (
 	log "github.com/ilya-rusyanov/gophkeeper/internal/logger"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
 )
 
 func main() {
@@ -24,7 +25,9 @@ func main() {
 	)
 	defer cancel()
 
-	grpcServer, err := grpcserver.New(config.ListenAddr, log)
+	grpcService := grpcservice.New()
+
+	grpcServer, err := grpcserver.New(config.ListenAddr, grpcService, log)
 	if err != nil {
 		log.Fatalf("failed to create gRPC server: %s", err.Error())
 	}

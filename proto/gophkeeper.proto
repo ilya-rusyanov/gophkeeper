@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gophkeeper;
+
+option go_package = "gophkeeper/proto";
+
+message UserCredentials {
+  string login = 1;
+  string password = 2;
+}
+
+message Empty {
+}
+
+service Gophkeeper {
+  rpc Register(UserCredentials) returns (Empty);
+}

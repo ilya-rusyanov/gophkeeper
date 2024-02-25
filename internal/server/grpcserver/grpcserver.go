@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/ilya-rusyanov/gophkeeper/proto"
 	"google.golang.org/grpc"
 )
 
@@ -21,7 +22,9 @@ type Server struct {
 }
 
 // New constructs gRPC server
-func New(listenAddr string, logger Logger) (*Server, error) {
+func New(
+	listenAddr string, service proto.GophkeeperServer, logger Logger,
+) (*Server, error) {
 	var err error
 
 	res := Server{
@@ -37,7 +40,7 @@ func New(listenAddr string, logger Logger) (*Server, error) {
 	logger.Infof("hello")
 	res.server = grpc.NewServer()
 
-	// TODO: register grpc service
+	proto.RegisterGophkeeperServer(res.server, service)
 
 	return &res, nil
 }

@@ -9,6 +9,7 @@
 
 ## Done
 
+- [ ] server grpc service
 - [ ] server stub
 - [ ] design server
 - [ ] client register usecase
