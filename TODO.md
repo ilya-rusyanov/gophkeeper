@@ -2,7 +2,6 @@
 
 - [ ] client server gateway
 - [ ] client controller impl
-- [ ] logger
 
 ## In progress
 
