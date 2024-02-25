@@ -2,32 +2,43 @@ package main
 
 import (
 	"context"
+	"os/signal"
+	"syscall"
 
-	"github.com/go-chi/chi"
-
-	"github.com/ilya-rusyanov/gophkeeper/internal/logger"
+	log "github.com/ilya-rusyanov/gophkeeper/internal/logger"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
-	"github.com/ilya-rusyanov/gophkeeper/internal/server/httpserver"
-	"github.com/ilya-rusyanov/gophkeeper/internal/shutdown"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
 )
 
 func main() {
 	config := config.New()
 	config.MustParse()
 
-	ctx := context.Background()
+	log := log.MustNew(config.LogLevel)
 
-	logger := logger.MustNew(config.LogLevel)
+	ctx, cancel := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGABRT,
+		syscall.SIGTERM,
+		syscall.SIGINT,
+	)
+	defer cancel()
 
-	r := chi.NewRouter()
-
-	var srvOpts []httpserver.Opt
-	if config.Secure {
-		srvOpts = append(srvOpts, httpserver.GenerateCert())
+	grpcServer, err := grpcserver.New(config.ListenAddr, log)
+	if err != nil {
+		log.Fatalf("failed to create gRPC server: %s", err.Error())
 	}
-	httpServer := httpserver.New(config.ListenAddr, r, srvOpts...)
 
-	done := shutdown.Wait(ctx, logger, httpServer)
+	errCh := grpcServer.Run()
 
-	<-done
+	select {
+	case <-ctx.Done():
+		log.Info("stopping on signal")
+		grpcServer.Stop()
+	case <-errCh:
+		for e := range errCh {
+			log.Errorf("error running server: %q", e.Error())
+		}
+		log.Info("server stopped")
+	}
 }

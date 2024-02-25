@@ -27,6 +27,8 @@ func New() *Config {
 
 // MustParse parses configuration or dies
 func (c *Config) MustParse() {
+	flag.Parse()
+
 	if val := os.Getenv("SERVER_ADDRESS"); len(val) > 0 {
 		c.ListenAddr = val
 	}
