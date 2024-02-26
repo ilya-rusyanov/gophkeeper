@@ -1,6 +1,9 @@
 package register
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
 type GenericError struct {
 	orig error
@@ -23,7 +26,7 @@ type CredentialsStorager interface {
 
 // Servicer is remote service
 type Servicer interface {
-	Register(login, password string) error
+	Register(ctx context.Context, login, password string) error
 }
 
 // Register is UC for user registration on server
@@ -44,8 +47,8 @@ func New(
 }
 
 // Register performs user registration
-func (r *Register) Register(login, password string) error {
-	if err := r.service.Register(login, password); err != nil {
+func (r *Register) Register(ctx context.Context, login, password string) error {
+	if err := r.service.Register(ctx, login, password); err != nil {
 		return NewGenericError(
 			fmt.Errorf("server error: %w", err),
 		)

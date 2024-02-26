@@ -1,17 +1,18 @@
 # TODO
 
-- [ ] client server gateway
 - [ ] client controller impl
 
 ## In progress
 
+- [ ] client server gateway
+
 ## Done
 
-- [ ] client usercred store impl
-- [ ] client controller register impl
-- [ ] server grpc service
-- [ ] server stub
-- [ ] design server
-- [ ] client register usecase
-- [ ] client register usecase test
-- [ ] client stub is buildable
+- [X] client usercred store impl
+- [X] client controller register impl
+- [X] server grpc service
+- [X] server stub
+- [X] design server
+- [X] client register usecase
+- [X] client register usecase test
+- [X] client stub is buildable

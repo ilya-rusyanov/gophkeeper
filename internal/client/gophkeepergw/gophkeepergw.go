@@ -1,5 +1,7 @@
 package gophkeepergw
 
+import "context"
+
 // GophKeeperGW is a gateway to the actual service
 type GophKeeperGW struct{}
 
@@ -9,7 +11,7 @@ func New(serverAddr string) *GophKeeperGW {
 	return &GophKeeperGW{}
 }
 
-func (gk *GophKeeperGW) Register(login, password string) error {
+func (gk *GophKeeperGW) Register(ctx context.Context, login, password string) error {
 	// TODO
 	return nil
 }

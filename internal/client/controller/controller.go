@@ -9,7 +9,7 @@ import (
 
 // Registerer is registration domain
 type Registerer interface {
-	Register(login string, password string) error
+	Register(ctx context.Context, login string, password string) error
 }
 
 // Controller is user controller for interaction with the application
@@ -45,7 +45,7 @@ func New(opts ...Opt) *Controller {
 
 // Run starts the controller
 func (c *Controller) Run(ctx context.Context) error {
-	if err := c.ctx.Run(); err != nil {
+	if err := c.ctx.Run(ctx); err != nil {
 		return fmt.Errorf("context error: %w", err)
 	}
 
