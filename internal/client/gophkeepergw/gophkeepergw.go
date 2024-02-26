@@ -1,17 +1,60 @@
 package gophkeepergw
 
-import "context"
+import (
+	"context"
+	"fmt"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/ilya-rusyanov/gophkeeper/proto"
+)
 
 // GophKeeperGW is a gateway to the actual service
-type GophKeeperGW struct{}
+type GophKeeperGW struct {
+	serverAddr string
+}
 
 // New creates an instance of the gateway
 func New(serverAddr string) *GophKeeperGW {
-	// TODO: implement actual constructor
-	return &GophKeeperGW{}
+	return &GophKeeperGW{
+		serverAddr: serverAddr,
+	}
 }
 
+// Register registers new user
 func (gk *GophKeeperGW) Register(ctx context.Context, login, password string) error {
-	// TODO
+	return gk.withConn(func(conn *grpc.ClientConn) error {
+		c := proto.NewGophkeeperClient(conn)
+
+		arg := proto.UserCredentials{
+			Login:    login,
+			Password: password,
+		}
+
+		_, err := c.Register(ctx, &arg)
+		if err != nil {
+			return fmt.Errorf("server error: %w", err)
+		}
+
+		return nil
+	})
+}
+
+func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
+	conn, err := grpc.Dial(
+		gk.serverAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to dial to server: %w", err)
+	}
+	defer conn.Close()
+
+	err = f(conn)
+	if err != nil {
+		return fmt.Errorf("failed to execute closure: %w", err)
+	}
+
 	return nil
 }

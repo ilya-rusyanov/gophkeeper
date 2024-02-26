@@ -25,7 +25,7 @@ func main() {
 	)
 	defer cancel()
 
-	grpcService := grpcservice.New()
+	grpcService := grpcservice.New(log)
 
 	grpcServer, err := grpcserver.New(config.ListenAddr, grpcService, log)
 	if err != nil {

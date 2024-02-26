@@ -1,13 +1,16 @@
 # TODO
 
-- [ ] client controller impl
+- [ ] server database
+- [ ] server register uc
+- [ ] grpc encryption
+- [ ] store hashed user password
+- [ ] makefile
 
 ## In progress
 
-- [ ] client server gateway
-
 ## Done
 
+- [X] client server gateway register
 - [X] client usercred store impl
 - [X] client controller register impl
 - [X] server grpc service

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"context"
 	"fmt"
 )
 
@@ -13,8 +12,8 @@ type RegisterCmd struct {
 }
 
 // Run performs registration
-func (r *RegisterCmd) Run(ctx context.Context) error {
-	err := r.uc.Register(ctx, r.Username, r.Password)
+func (r *RegisterCmd) Run(ctx *Arg) error {
+	err := r.uc.Register(ctx.Context, r.Username, r.Password)
 	if err != nil {
 		return fmt.Errorf("usecase registration error: %w", err)
 	}
