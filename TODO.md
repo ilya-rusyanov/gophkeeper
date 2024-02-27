@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] server controller handling user already exists test
 - [ ] client MyCredentials instead of passing login/password
 - [ ] server password salt from config
 - [ ] server database
@@ -13,6 +12,8 @@
 - [ ] makefile
 
 ## In progress
+
+- [ ] server controller handling user already exists test
 
 ## Done
 
