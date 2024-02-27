@@ -1,19 +1,20 @@
 # TODO
 
-- [ ] server password salt from config
 - [ ] server database
 - [ ] server users repo impl
 - [ ] grpc encryption
-- [ ] store hashed user password
-- [ ] server data storage
+- [ ] store credentials
 - [ ] makefile unix, osx, windows
-- [ ] login client
-- [ ] login server
+- [ ] server password salt from config
+- [ ] login functionality
+- [ ] client commandline global flags
 
 ## In progress
 
 ## Done
 
+- [X] server first migration
+- [X] store hashed user password
 - [X] client MyCredentials instead of passing login/password
 - [X] makefile
 - [X] server controller handling user already exists test
