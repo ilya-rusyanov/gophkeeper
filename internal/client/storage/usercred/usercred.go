@@ -5,6 +5,8 @@ import (
 	"os"
 
 	keyring "github.com/zalando/go-keyring"
+
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
 type Logger interface {
@@ -29,13 +31,13 @@ func New(log Logger, usernameFilename, appName string) *UserCred {
 }
 
 // Store saves login and password
-func (c *UserCred) Store(login, password string) error {
-	if err := os.WriteFile(c.userNameFileName, []byte(login), 0o600); err != nil {
+func (c *UserCred) Store(cred entity.MyCredentials) error {
+	if err := os.WriteFile(c.userNameFileName, []byte(cred.Login), 0o600); err != nil {
 		return fmt.Errorf("failed to write login file: %w", err)
 	}
-	c.log.Debugf("updated user login file %q with %q", c.userNameFileName, login)
+	c.log.Debugf("updated user login file %q with %q", c.userNameFileName, cred.Login)
 
-	if err := keyring.Set(c.appName, login, password); err != nil {
+	if err := keyring.Set(c.appName, cred.Login, cred.Password); err != nil {
 		return fmt.Errorf("keyring failed to store the password: %w", err)
 	}
 	c.log.Debug("successfully stored user credentials in keyring")

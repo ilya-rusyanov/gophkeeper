@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
 
@@ -23,13 +24,13 @@ func New(serverAddr string) *GophKeeperGW {
 }
 
 // Register registers new user
-func (gk *GophKeeperGW) Register(ctx context.Context, login, password string) error {
+func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials) error {
 	return gk.withConn(func(conn *grpc.ClientConn) error {
 		c := proto.NewGophkeeperClient(conn)
 
 		arg := proto.UserCredentials{
-			Login:    login,
-			Password: password,
+			Login:    cred.Login,
+			Password: cred.Password,
 		}
 
 		_, err := c.Register(ctx, &arg)

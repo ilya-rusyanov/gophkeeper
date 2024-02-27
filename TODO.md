@@ -1,20 +1,21 @@
 # TODO
 
-- [ ] client MyCredentials instead of passing login/password
 - [ ] server password salt from config
 - [ ] server database
 - [ ] server users repo impl
 - [ ] grpc encryption
 - [ ] store hashed user password
+- [ ] server data storage
+- [ ] makefile unix, osx, windows
 - [ ] login client
 - [ ] login server
-- [ ] server data storage
-- [ ] makefile
 
 ## In progress
 
 ## Done
 
+- [X] client MyCredentials instead of passing login/password
+- [X] makefile
 - [X] server controller handling user already exists test
 - [X] server register user already exists test
 - [X] server register usecase

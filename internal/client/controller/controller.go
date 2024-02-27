@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
 // Arg is execution context
@@ -12,9 +14,9 @@ type Arg struct {
 	Context context.Context
 }
 
-// Registerer is registration domain
+// Registerer is registration domain logic
 type Registerer interface {
-	Register(ctx context.Context, login string, password string) error
+	Register(context.Context, entity.MyCredentials) error
 }
 
 // Controller is user controller for interaction with the application

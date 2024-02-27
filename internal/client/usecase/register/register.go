@@ -3,6 +3,8 @@ package register
 import (
 	"context"
 	"fmt"
+
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
 // GenericError represents generic error
@@ -24,12 +26,12 @@ func (e *GenericError) Error() string {
 
 // CredentialsStorager represents storage of credentials
 type CredentialsStorager interface {
-	Store(login, password string) error
+	Store(entity.MyCredentials) error
 }
 
 // Servicer is remote service
 type Servicer interface {
-	Register(ctx context.Context, login, password string) error
+	Register(context.Context, entity.MyCredentials) error
 }
 
 // Register is UC for user registration on server
@@ -50,14 +52,14 @@ func New(
 }
 
 // Register performs user registration
-func (r *Register) Register(ctx context.Context, login, password string) error {
-	if err := r.service.Register(ctx, login, password); err != nil {
+func (r *Register) Register(ctx context.Context, credentials entity.MyCredentials) error {
+	if err := r.service.Register(ctx, credentials); err != nil {
 		return NewGenericError(
 			fmt.Errorf("server error: %w", err),
 		)
 	}
 
-	if err := r.storage.Store(login, password); err != nil {
+	if err := r.storage.Store(credentials); err != nil {
 		return NewGenericError(
 			fmt.Errorf("credentials storage error: %w", err),
 		)
