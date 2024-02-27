@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] store different credentials functionality
+- [ ] load different credentials functionality
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
 - [ ] server password salt from config
