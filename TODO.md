@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] server database
 - [ ] server users repo impl
 - [ ] grpc encryption
 - [ ] store credentials
@@ -11,8 +10,10 @@
 
 ## In progress
 
+
 ## Done
 
+- [X] server database
 - [X] server first migration
 - [X] store hashed user password
 - [X] client MyCredentials instead of passing login/password

@@ -9,6 +9,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/postgres"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/register"
 )
@@ -19,10 +20,6 @@ func main() {
 
 	log := log.MustNew(config.LogLevel)
 
-	userRepo := user.New()
-
-	registerUC := register.New("TODO: salt", userRepo)
-
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGABRT,
@@ -30,6 +27,24 @@ func main() {
 		syscall.SIGINT,
 	)
 	defer cancel()
+
+	db, err := postgres.New(
+		ctx,
+		log,
+		config.DSN,
+	)
+	if err != nil {
+		log.Fatal("database error: %s", err.Error())
+	}
+	defer func() {
+		if err = db.Close(); err != nil {
+			log.Error("failed to close DB: %s", err.Error())
+		}
+	}()
+
+	userRepo := user.New()
+
+	registerUC := register.New("TODO: salt", userRepo)
 
 	grpcService := grpcservice.New(
 		log,
