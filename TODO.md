@@ -1,6 +1,8 @@
 # TODO
 
-- [ ] password salt from config
+- [ ] server controller handling user already exists test
+- [ ] client MyCredentials instead of passing login/password
+- [ ] server password salt from config
 - [ ] server database
 - [ ] server users repo impl
 - [ ] grpc encryption
@@ -12,10 +14,9 @@
 
 ## In progress
 
-- [ ] more server register tests
-
 ## Done
 
+- [X] server register user already exists test
 - [X] server register usecase
 - [X] test server register usecase
 - [X] retest client register usecase
