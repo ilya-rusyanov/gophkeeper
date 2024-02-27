@@ -2,7 +2,11 @@ package grpcservice
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
 	"github.com/ilya-rusyanov/gophkeeper/proto"
@@ -36,11 +40,17 @@ func New(log Logger, reg RegisterUC) *Service {
 func (s *Service) Register(ctx context.Context, credentials *proto.UserCredentials) (*proto.Empty, error) {
 	var res proto.Empty
 
-	if err := s.registration.Register(
+	err := s.registration.Register(
 		ctx,
-		*entity.NewUserCredentials(credentials.Login, credentials.Password),
-	); err != nil {
-		return &res, fmt.Errorf("failed to register: %w", err)
+		*entity.NewUserCredentials(
+			credentials.Login, credentials.Password,
+		),
+	)
+	switch {
+	case errors.Is(err, entity.ErrUserAlreadyExists):
+		return nil, status.Error(codes.AlreadyExists, "user already exists")
+	case err != nil:
+		return nil, fmt.Errorf("failed to register: %w", err)
 	}
 
 	s.log.Debugf("incoming register request for %q completed successfully", credentials.Login)

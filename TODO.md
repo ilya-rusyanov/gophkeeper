@@ -13,10 +13,9 @@
 
 ## In progress
 
-- [ ] server controller handling user already exists test
-
 ## Done
 
+- [X] server controller handling user already exists test
 - [X] server register user already exists test
 - [X] server register usecase
 - [X] test server register usecase
