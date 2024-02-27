@@ -9,6 +9,8 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/register"
 )
 
 func main() {
@@ -16,6 +18,10 @@ func main() {
 	config.MustParse()
 
 	log := log.MustNew(config.LogLevel)
+
+	userRepo := user.New()
+
+	registerUC := register.New("TODO: salt", userRepo)
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
@@ -25,7 +31,10 @@ func main() {
 	)
 	defer cancel()
 
-	grpcService := grpcservice.New(log)
+	grpcService := grpcservice.New(
+		log,
+		registerUC,
+	)
 
 	grpcServer, err := grpcserver.New(config.ListenAddr, grpcService, log)
 	if err != nil {

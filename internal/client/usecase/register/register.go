@@ -5,16 +5,19 @@ import (
 	"fmt"
 )
 
+// GenericError represents generic error
 type GenericError struct {
 	orig error
 }
 
+// NewGenericError constructs GenericError
 func NewGenericError(orig error) *GenericError {
 	return &GenericError{
 		orig: orig,
 	}
 }
 
+// Error returns error text
 func (e *GenericError) Error() string {
 	return "generic error: " + e.orig.Error()
 }
