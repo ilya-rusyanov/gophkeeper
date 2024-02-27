@@ -42,9 +42,9 @@ func main() {
 		}
 	}()
 
-	userRepo := user.New()
+	userRepo := user.New(db)
 
-	registerUC := register.New("TODO: salt", userRepo)
+	registerUC := register.New("TODO: salt", userRepo, log)
 
 	grpcService := grpcservice.New(
 		log,

@@ -1,8 +1,7 @@
 # TODO
 
-- [ ] server users repo impl
+- [ ] store different credentials functionality
 - [ ] grpc encryption
-- [ ] store credentials
 - [ ] makefile unix, osx, windows
 - [ ] server password salt from config
 - [ ] login functionality
@@ -10,9 +9,9 @@
 
 ## In progress
 
-
 ## Done
 
+- [X] server users repo store impl
 - [X] server database
 - [X] server first migration
 - [X] store hashed user password

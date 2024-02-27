@@ -10,6 +10,10 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
 )
 
+type Logger interface {
+	Debugf(string, ...any)
+}
+
 // Repository stores user credentials
 type Repository interface {
 	Store(context.Context, entity.UserCredentials) error
@@ -19,13 +23,15 @@ type Repository interface {
 type UC struct {
 	salt string
 	repo Repository
+	log  Logger
 }
 
 // New constructs registration use case
-func New(salt string, repo Repository) *UC {
+func New(salt string, repo Repository, log Logger) *UC {
 	return &UC{
 		salt: salt,
 		repo: repo,
+		log:  log,
 	}
 }
 
@@ -45,6 +51,7 @@ func (uc *UC) Register(
 	if err != nil {
 		return fmt.Errorf("repository failed to store credentials: %w", err)
 	}
+	uc.log.Debugf("registered new user %q", creds.Login)
 
 	return nil
 }
