@@ -23,7 +23,9 @@ type Registerer interface {
 type Controller struct {
 	cli struct {
 		Register RegisterCmd `cmd:"" help:"Register user"`
+		config   Config      `embed:""`
 	}
+	kongCtx *kong.Context
 }
 
 // Opt is a funcopt
@@ -37,21 +39,23 @@ func WithRegister(r Registerer) Opt {
 }
 
 // New constructs controller
-func New(opts ...Opt) *Controller {
+func New() (*Controller, Config) {
 	var res Controller
 
-	for _, o := range opts {
-		o(&res)
-	}
+	res.kongCtx = kong.Parse(&res.cli)
 
-	return &res
+	return &res, res.cli.config
 }
 
 // Run starts the controller
-func (c *Controller) Run(ctx context.Context) error {
-	kongCtx := kong.Parse(&c.cli)
+func (c *Controller) Run(
+	ctx context.Context, opts ...Opt,
+) error {
+	for _, o := range opts {
+		o(c)
+	}
 
-	if err := kongCtx.Run(&Arg{Context: ctx}); err != nil {
+	if err := c.kongCtx.Run(&Arg{Context: ctx}); err != nil {
 		return fmt.Errorf("context error: %w", err)
 	}
 

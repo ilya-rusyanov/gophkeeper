@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ilya-rusyanov/gophkeeper/internal/client/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/usercred"
@@ -14,14 +13,9 @@ import (
 )
 
 func main() {
-	log := logger.MustNew("info")
+	ctrl, cfg := controller.New()
 
-	cfg, err := config.New()
-	if err != nil {
-		log.Fatalf("configuration error: %q", err.Error())
-	}
-
-	log = logger.MustNew(cfg.LogLevel)
+	log := logger.MustNew(cfg.LogLevel)
 
 	userCredentialsStorage := usercred.New(
 		log,
@@ -38,10 +32,6 @@ func main() {
 		gophkeeperGateway,
 	)
 
-	ctrl := controller.New(
-		controller.WithRegister(registerUseCase),
-	)
-
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGABRT,
@@ -50,7 +40,10 @@ func main() {
 	)
 	defer cancel()
 
-	if err := ctrl.Run(ctx); err != nil {
+	if err := ctrl.Run(
+		ctx,
+		controller.WithRegister(registerUseCase),
+	); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -17,10 +17,10 @@
 ## In progress
 
 - [ ] store different credentials functionality
-- [ ] client must output help even if env variable is not set
 
 ## Done
 
+- [X] client must output help even if env variable is not set
 - [X] test server store controller
 - [X] store proto method
 - [X] rename register argument in proto
