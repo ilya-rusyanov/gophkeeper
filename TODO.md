@@ -1,7 +1,5 @@
 # TODO
 
-- [ ] store different credentials functionality
-- [ ] store proto method
 - [ ] test server store controller
 - [ ] server store usecase
 - [ ] load different credentials functionality
@@ -16,10 +14,12 @@
 
 ## In progress
 
-- [ ] rename register argument in proto
+- [ ] store different credentials functionality
+- [ ] store proto method
 
 ## Done
 
+- [X] rename register argument in proto
 - [X] proto go generate
 - [X] server users repo store impl
 - [X] server database

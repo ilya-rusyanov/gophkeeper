@@ -28,9 +28,11 @@ func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials)
 	return gk.withConn(func(conn *grpc.ClientConn) error {
 		c := proto.NewGophkeeperClient(conn)
 
-		arg := proto.UserCredentials{
-			Login:    cred.Login,
-			Password: cred.Password,
+		arg := proto.RegisterRequest{
+			Credentials: &proto.UserCredentials{
+				Login:    cred.Login,
+				Password: cred.Password,
+			},
 		}
 
 		_, err := c.Register(ctx, &arg)

@@ -37,13 +37,16 @@ func New(log Logger, reg RegisterUC) *Service {
 }
 
 // Register is user registration endpoint
-func (s *Service) Register(ctx context.Context, credentials *proto.UserCredentials) (*proto.Empty, error) {
+func (s *Service) Register(
+	ctx context.Context, request *proto.RegisterRequest,
+) (*proto.Empty, error) {
 	var res proto.Empty
 
 	err := s.registration.Register(
 		ctx,
 		*entity.NewUserCredentials(
-			credentials.Login, credentials.Password,
+			request.Credentials.Login,
+			request.Credentials.Password,
 		),
 	)
 	switch {
@@ -53,7 +56,7 @@ func (s *Service) Register(ctx context.Context, credentials *proto.UserCredentia
 		return nil, fmt.Errorf("failed to register: %w", err)
 	}
 
-	s.log.Debugf("incoming register request for %q completed successfully", credentials.Login)
+	s.log.Debugf("incoming register request for %q completed successfully", request.Credentials.Login)
 
 	return &res, nil
 }

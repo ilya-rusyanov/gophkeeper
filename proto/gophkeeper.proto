@@ -9,9 +9,13 @@ message UserCredentials {
   string password = 2;
 }
 
+message RegisterRequest {
+  UserCredentials credentials = 1;
+}
+
 message Empty {
 }
 
 service Gophkeeper {
-  rpc Register(UserCredentials) returns (Empty);
+  rpc Register(RegisterRequest) returns (Empty);
 }

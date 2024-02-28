@@ -13,6 +13,10 @@ import (
 
 //go:generate mockgen -package mock -destination ./mock/mocks.go . Repository
 
+type dummyLog struct{}
+
+func (l *dummyLog) Debugf(string, ...any) {}
+
 func TestRegister(t *testing.T) {
 	t.Run("register ok", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -20,12 +24,14 @@ func TestRegister(t *testing.T) {
 
 		repo := mock.NewMockRepository(ctrl)
 
-		repo.EXPECT().Store(gomock.Any(), entity.UserCredentials{
-			Login:    "john",
-			Password: "b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
-		})
+		repo.EXPECT().Store(
+			gomock.Any(),
+			*entity.NewUserCredentials(
+				"john",
+				"b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
+			))
 
-		reg := New("salt", repo)
+		reg := New("salt", repo, &dummyLog{})
 
 		err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
 
@@ -38,12 +44,14 @@ func TestRegister(t *testing.T) {
 
 		repo := mock.NewMockRepository(ctrl)
 
-		repo.EXPECT().Store(gomock.Any(), entity.UserCredentials{
-			Login:    "john",
-			Password: "b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
-		}).Return(entity.ErrUserAlreadyExists)
+		repo.EXPECT().Store(
+			gomock.Any(),
+			*entity.NewUserCredentials(
+				"john",
+				"b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
+			)).Return(entity.ErrUserAlreadyExists)
 
-		reg := New("salt", repo)
+		reg := New("salt", repo, &dummyLog{})
 
 		err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
 

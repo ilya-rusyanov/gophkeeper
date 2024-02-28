@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GophkeeperClient interface {
-	Register(ctx context.Context, in *UserCredentials, opts ...grpc.CallOption) (*Empty, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type gophkeeperClient struct {
@@ -37,7 +37,7 @@ func NewGophkeeperClient(cc grpc.ClientConnInterface) GophkeeperClient {
 	return &gophkeeperClient{cc}
 }
 
-func (c *gophkeeperClient) Register(ctx context.Context, in *UserCredentials, opts ...grpc.CallOption) (*Empty, error) {
+func (c *gophkeeperClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, Gophkeeper_Register_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -50,7 +50,7 @@ func (c *gophkeeperClient) Register(ctx context.Context, in *UserCredentials, op
 // All implementations must embed UnimplementedGophkeeperServer
 // for forward compatibility
 type GophkeeperServer interface {
-	Register(context.Context, *UserCredentials) (*Empty, error)
+	Register(context.Context, *RegisterRequest) (*Empty, error)
 	mustEmbedUnimplementedGophkeeperServer()
 }
 
@@ -58,7 +58,7 @@ type GophkeeperServer interface {
 type UnimplementedGophkeeperServer struct {
 }
 
-func (UnimplementedGophkeeperServer) Register(context.Context, *UserCredentials) (*Empty, error) {
+func (UnimplementedGophkeeperServer) Register(context.Context, *RegisterRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedGophkeeperServer) mustEmbedUnimplementedGophkeeperServer() {}
@@ -75,7 +75,7 @@ func RegisterGophkeeperServer(s grpc.ServiceRegistrar, srv GophkeeperServer) {
 }
 
 func _Gophkeeper_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserCredentials)
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func _Gophkeeper_Register_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: Gophkeeper_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GophkeeperServer).Register(ctx, req.(*UserCredentials))
+		return srv.(GophkeeperServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

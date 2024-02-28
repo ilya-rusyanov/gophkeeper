@@ -38,10 +38,13 @@ func TestRegister(t *testing.T) {
 
 		grpcsvc := New(&dummyLogger{}, uc)
 
-		_, err := grpcsvc.Register(ctx, &proto.UserCredentials{
-			Login:    "john",
-			Password: "strongpw",
-		})
+		_, err := grpcsvc.Register(ctx,
+			&proto.RegisterRequest{
+				Credentials: &proto.UserCredentials{
+					Login:    "john",
+					Password: "strongpw",
+				},
+			})
 
 		assert.NoError(t, err)
 	})
@@ -57,7 +60,10 @@ func TestRegister(t *testing.T) {
 
 		grpcsvc := New(&dummyLogger{}, uc)
 
-		_, err := grpcsvc.Register(ctx, &proto.UserCredentials{})
+		_, err := grpcsvc.Register(ctx,
+			&proto.RegisterRequest{
+				Credentials: &proto.UserCredentials{},
+			})
 
 		assert.Equal(t, codes.AlreadyExists, status.Code(err))
 	})
