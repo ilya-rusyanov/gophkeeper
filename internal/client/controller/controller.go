@@ -25,6 +25,7 @@ type Controller struct {
 		Register RegisterCmd `cmd:"" help:"Register user"`
 		Config   Config      `embed:""`
 	}
+	args []string
 }
 
 // Opt is a funcopt
@@ -38,19 +39,19 @@ func WithRegister(r Registerer) Opt {
 }
 
 // ReadConfig reads and returns app configuration
-func ReadConfig() Config {
+func ReadConfig(args []string) Config {
 	var ctrl Controller
 
-	_ = kong.Parse(&ctrl.cli)
+	_ = parse(args, &ctrl.cli)
 
 	return ctrl.cli.Config
 }
 
 // New constructs controller
-func New() *Controller {
+func New(args []string) *Controller {
 	var res Controller
 
-	_ = kong.Parse(&res.cli)
+	res.args = args
 
 	return &res
 }
@@ -59,7 +60,7 @@ func New() *Controller {
 func (c *Controller) Run(
 	ctx context.Context, opts ...Opt,
 ) error {
-	kongCtx := kong.Parse(&c.cli)
+	kongCtx := parse(c.args, &c.cli)
 
 	for _, o := range opts {
 		o(c)
@@ -70,4 +71,15 @@ func (c *Controller) Run(
 	}
 
 	return nil
+}
+
+func parse(args []string, grammar any) *kong.Context {
+	k, err := kong.New(grammar)
+	if err != nil {
+		panic(err)
+	}
+	ctx, err := k.Parse(args)
+	k.FatalIfErrorf(err)
+
+	return ctx
 }

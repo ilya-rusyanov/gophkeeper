@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] test client controller
 - [ ] client store controller impl
 - [ ] server store usecase
 - [ ] load different credentials functionality
@@ -17,6 +16,7 @@
 ## In progress
 
 - [ ] store different credentials functionality
+- [ ] test client controller
 
 ## Done
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -13,7 +14,9 @@ import (
 )
 
 func main() {
-	cfg := controller.ReadConfig()
+	cmdlineArgs := os.Args[1:]
+
+	cfg := controller.ReadConfig(cmdlineArgs)
 
 	log := logger.MustNew(cfg.LogLevel)
 
@@ -32,7 +35,7 @@ func main() {
 		gophkeeperGateway,
 	)
 
-	ctrl := controller.New()
+	ctrl := controller.New(cmdlineArgs)
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
