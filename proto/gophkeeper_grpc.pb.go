@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Gophkeeper_Register_FullMethodName = "/gophkeeper.Gophkeeper/Register"
+	Gophkeeper_Store_FullMethodName    = "/gophkeeper.Gophkeeper/Store"
 )
 
 // GophkeeperClient is the client API for Gophkeeper service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GophkeeperClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Empty, error)
+	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type gophkeeperClient struct {
@@ -46,11 +48,21 @@ func (c *gophkeeperClient) Register(ctx context.Context, in *RegisterRequest, op
 	return out, nil
 }
 
+func (c *gophkeeperClient) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Gophkeeper_Store_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GophkeeperServer is the server API for Gophkeeper service.
 // All implementations must embed UnimplementedGophkeeperServer
 // for forward compatibility
 type GophkeeperServer interface {
 	Register(context.Context, *RegisterRequest) (*Empty, error)
+	Store(context.Context, *StoreRequest) (*Empty, error)
 	mustEmbedUnimplementedGophkeeperServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedGophkeeperServer struct {
 
 func (UnimplementedGophkeeperServer) Register(context.Context, *RegisterRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedGophkeeperServer) Store(context.Context, *StoreRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
 }
 func (UnimplementedGophkeeperServer) mustEmbedUnimplementedGophkeeperServer() {}
 
@@ -92,6 +107,24 @@ func _Gophkeeper_Register_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gophkeeper_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).Store(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_Store_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).Store(ctx, req.(*StoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gophkeeper_ServiceDesc is the grpc.ServiceDesc for Gophkeeper service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var Gophkeeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _Gophkeeper_Register_Handler,
+		},
+		{
+			MethodName: "Store",
+			Handler:    _Gophkeeper_Store_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

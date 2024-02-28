@@ -15,10 +15,10 @@
 ## In progress
 
 - [ ] store different credentials functionality
-- [ ] store proto method
 
 ## Done
 
+- [X] store proto method
 - [X] rename register argument in proto
 - [X] proto go generate
 - [X] server users repo store impl

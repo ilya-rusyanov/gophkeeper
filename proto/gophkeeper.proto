@@ -13,9 +13,22 @@ message RegisterRequest {
   UserCredentials credentials = 1;
 }
 
+message StoreRequest {
+  UserCredentials credentials = 1;
+
+  string type = 10;
+
+  string name = 20;
+
+  string meta = 30;
+
+  bytes payload = 40;
+}
+
 message Empty {
 }
 
 service Gophkeeper {
   rpc Register(RegisterRequest) returns (Empty);
+  rpc Store(StoreRequest) returns (Empty);
 }
