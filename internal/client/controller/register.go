@@ -6,7 +6,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
-// RegisterCmd is registration commnand
+// RegisterCmd is registration subcommand
 type RegisterCmd struct {
 	Username string     `required:"" help:"username"`
 	Password string     `required:"" help:"password"`

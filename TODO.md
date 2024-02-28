@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] test client controller
+- [ ] client store controller impl
 - [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
@@ -15,6 +17,7 @@
 ## In progress
 
 - [ ] store different credentials functionality
+- [ ] client must output help even if env variable is not set
 
 ## Done
 
