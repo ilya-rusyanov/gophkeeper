@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	ctrl, cfg := controller.New()
+	cfg := controller.ReadConfig()
 
 	log := logger.MustNew(cfg.LogLevel)
 
@@ -31,6 +31,8 @@ func main() {
 		userCredentialsStorage,
 		gophkeeperGateway,
 	)
+
+	ctrl := controller.New()
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
