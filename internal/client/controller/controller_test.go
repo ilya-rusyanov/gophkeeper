@@ -12,6 +12,7 @@ import (
 )
 
 //go:generate mockgen -destination ./mock/registerer.go -package mock . Registerer
+//go:generate mockgen -destination ./mock/storer.go -package mock . Storer
 
 func TestReadConfig(t *testing.T) {
 	t.Run("values", func(t *testing.T) {
@@ -51,6 +52,40 @@ func TestController(t *testing.T) {
 		))
 
 		err := c.Run(ctx, WithRegister(reg))
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("store auth", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		stor := mock.NewMockStorer(ctrl)
+
+		stor.EXPECT().StoreAuth(
+			gomock.Any(),
+			entity.Credentials{
+				Name: "yandex mail",
+				Meta: []string{
+					"website:mail.ya.ru",
+					"expires:june",
+				},
+				Login:    "john",
+				Password: "strongpw",
+			},
+		)
+
+		c := New(args(t,
+			"store",
+			"auth",
+			"yandex mail",
+			"--meta", "website:mail.ya.ru",
+			"--meta", "expires:june",
+			"-l", "john",
+			"-p", "strongpw",
+		))
+
+		err := c.Run(ctx, WithStore(stor))
 
 		assert.NoError(t, err)
 	})

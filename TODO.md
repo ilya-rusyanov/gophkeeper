@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] client store controller impl
 - [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
@@ -16,10 +15,12 @@
 ## In progress
 
 - [ ] store different credentials functionality
-- [ ] test client controller
+- [ ] client store usecase
 
 ## Done
 
+- [X] test client controller store auth impl
+- [x] test client controller
 - [X] client must output help even if env variable is not set
 - [X] test server store controller
 - [X] store proto method

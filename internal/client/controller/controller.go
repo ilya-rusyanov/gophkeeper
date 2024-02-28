@@ -19,10 +19,16 @@ type Registerer interface {
 	Register(context.Context, entity.MyCredentials) error
 }
 
+// Storer domain logic of storing data
+type Storer interface {
+	StoreAuth(context.Context, entity.Credentials) error
+}
+
 // Controller is user controller for interaction with the application
 type Controller struct {
 	cli struct {
 		Register RegisterCmd `cmd:"" help:"Register user"`
+		Store    StoreCmd    `cmd:"" help:"Store data"`
 		Config   Config      `embed:""`
 	}
 	args []string
@@ -31,10 +37,17 @@ type Controller struct {
 // Opt is a funcopt
 type Opt func(*Controller)
 
-// WithRegister specifies Register UC
+// WithRegister specifies Register use case
 func WithRegister(r Registerer) Opt {
 	return func(c *Controller) {
 		c.cli.Register.uc = r
+	}
+}
+
+// WithStore specifies Store use case
+func WithStore(r Storer) Opt {
+	return func(c *Controller) {
+		c.cli.Store.Auth.uc = r
 	}
 }
 

@@ -14,9 +14,9 @@ type RegisterCmd struct {
 }
 
 // Run performs registration
-func (r *RegisterCmd) Run(ctx *Arg) error {
+func (r *RegisterCmd) Run(arg *Arg) error {
 	err := r.uc.Register(
-		ctx.Context,
+		arg.Context,
 		*entity.NewMyCredentials(r.Username, r.Password),
 	)
 	if err != nil {
