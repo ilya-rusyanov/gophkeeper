@@ -1,17 +1,26 @@
 # TODO
 
 - [ ] store different credentials functionality
+- [ ] store proto method
+- [ ] test server store controller
+- [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
 - [ ] server password salt from config
 - [ ] login functionality
 - [ ] client commandline global flags
+- [ ] prevent user from able to store or load before registering
+- [ ] use same environment variables for client and server
+- [ ] force store functionality (overwrite) client (flag) and server (update)
 
 ## In progress
 
+- [ ] rename register argument in proto
+
 ## Done
 
+- [X] proto go generate
 - [X] server users repo store impl
 - [X] server database
 - [X] server first migration
