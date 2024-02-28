@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] test server store controller
 - [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
@@ -11,6 +10,7 @@
 - [ ] prevent user from able to store or load before registering
 - [ ] use same environment variables for client and server
 - [ ] force store functionality (overwrite) client (flag) and server (update)
+- [ ] log format for client should be plain text and not json
 
 ## In progress
 
@@ -18,6 +18,7 @@
 
 ## Done
 
+- [X] test server store controller
 - [X] store proto method
 - [X] rename register argument in proto
 - [X] proto go generate

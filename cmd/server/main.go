@@ -12,6 +12,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/postgres"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/register"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/store"
 )
 
 func main() {
@@ -46,9 +47,12 @@ func main() {
 
 	registerUC := register.New("TODO: salt", userRepo, log)
 
+	storeUC := store.New()
+
 	grpcService := grpcservice.New(
 		log,
 		registerUC,
+		storeUC,
 	)
 
 	grpcServer, err := grpcserver.New(config.ListenAddr, grpcService, log)

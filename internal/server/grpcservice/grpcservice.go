@@ -16,23 +16,30 @@ type Logger interface {
 	Debugf(string, ...any)
 }
 
-// RegisterUC is registration use case
-type RegisterUC interface {
+// IRegisterUC is registration use case
+type IRegisterUC interface {
 	Register(context.Context, entity.UserCredentials) error
+}
+
+// IStoreUC is store data use case
+type IStoreUC interface {
+	Store(context.Context, *entity.StoreIn) error
 }
 
 // Service is a gophkeeper gRPC service
 type Service struct {
 	proto.UnimplementedGophkeeperServer
 	log          Logger
-	registration RegisterUC
+	registration IRegisterUC
+	store        IStoreUC
 }
 
 // New constructs Service
-func New(log Logger, reg RegisterUC) *Service {
+func New(log Logger, reg IRegisterUC, store IStoreUC) *Service {
 	return &Service{
 		log:          log,
 		registration: reg,
+		store:        store,
 	}
 }
 
@@ -44,19 +51,63 @@ func (s *Service) Register(
 
 	err := s.registration.Register(
 		ctx,
-		*entity.NewUserCredentials(
-			request.Credentials.Login,
-			request.Credentials.Password,
-		),
+		toUserCredentials(request.Credentials),
 	)
 	switch {
 	case errors.Is(err, entity.ErrUserAlreadyExists):
-		return nil, status.Error(codes.AlreadyExists, "user already exists")
+		return nil, status.Error(
+			codes.AlreadyExists,
+			"user already exists")
 	case err != nil:
-		return nil, fmt.Errorf("failed to register: %w", err)
+		return nil, status.Error(
+			codes.Internal,
+			fmt.Sprintf("failed to register: %s", err.Error()))
 	}
 
 	s.log.Debugf("incoming register request for %q completed successfully", request.Credentials.Login)
 
 	return &res, nil
+}
+
+// Store performs storage of user's data
+func (s *Service) Store(
+	ctx context.Context, request *proto.StoreRequest,
+) (*proto.Empty, error) {
+	var res proto.Empty
+
+	err := s.store.Store(
+		ctx,
+		entity.NewStoreIn(
+			toUserCredentials(request.Credentials),
+			request.Type,
+			request.Name,
+			request.Meta,
+			request.Payload,
+		),
+	)
+	switch {
+	case errors.Is(err, entity.ErrAuthFailed):
+		return nil, status.Error(
+			codes.Unauthenticated,
+			fmt.Sprintf("auth failed: %s", err.Error()))
+	case err != nil:
+		return nil, status.Error(
+			codes.Internal,
+			fmt.Sprintf("internal error: %s", err.Error()))
+	}
+
+	return &res, nil
+}
+
+func toUserCredentials(c *proto.UserCredentials) entity.UserCredentials {
+	var res entity.UserCredentials
+
+	if c == nil {
+		return res
+	}
+
+	res.Login = c.Login
+	res.Password = c.Password
+
+	return res
 }

@@ -2,6 +2,7 @@ package grpcservice
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,8 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
 
-//go:generate mockgen -destination ./mock/registeruc.go -package mock . RegisterUC
+//go:generate mockgen -destination ./mock/iregisteruc.go -package mock . IRegisterUC
+//go:generate mockgen -destination ./mock/istoreuc.go -package mock . IStoreUC
 
 type dummyLogger struct{}
 
@@ -29,14 +31,14 @@ func TestRegister(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		uc := mock.NewMockRegisterUC(ctrl)
+		uc := mock.NewMockIRegisterUC(ctrl)
 
 		uc.EXPECT().Register(
 			gomock.Any(),
 			*entity.NewUserCredentials("john", "strongpw"),
 		)
 
-		grpcsvc := New(&dummyLogger{}, uc)
+		grpcsvc := New(&dummyLogger{}, uc, nil)
 
 		_, err := grpcsvc.Register(ctx,
 			&proto.RegisterRequest{
@@ -53,12 +55,12 @@ func TestRegister(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		uc := mock.NewMockRegisterUC(ctrl)
+		uc := mock.NewMockIRegisterUC(ctrl)
 
 		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
 			Return(entity.ErrUserAlreadyExists)
 
-		grpcsvc := New(&dummyLogger{}, uc)
+		grpcsvc := New(&dummyLogger{}, uc, nil)
 
 		_, err := grpcsvc.Register(ctx,
 			&proto.RegisterRequest{
@@ -66,5 +68,107 @@ func TestRegister(t *testing.T) {
 			})
 
 		assert.Equal(t, codes.AlreadyExists, status.Code(err))
+	})
+
+	t.Run("other error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mock.NewMockIRegisterUC(ctrl)
+
+		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
+			Return(errors.New("a different error"))
+
+		grpcsvc := New(&dummyLogger{}, uc, nil)
+
+		_, err := grpcsvc.Register(ctx,
+			&proto.RegisterRequest{
+				Credentials: &proto.UserCredentials{},
+			})
+
+		assert.Equal(t, codes.Internal, status.Code(err))
+	})
+}
+
+func TestStore(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("successfull store", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mock.NewMockIStoreUC(ctrl)
+
+		uc.EXPECT().Store(
+			gomock.Any(),
+			entity.NewStoreIn(
+				*entity.NewUserCredentials("john", "strongpw"),
+				"paycard",
+				"tinkoff",
+				`{"valid":true}`,
+				[]byte("4437"),
+			),
+		)
+
+		grpcsvc := New(&dummyLogger{}, nil, uc)
+
+		_, err := grpcsvc.Store(ctx,
+			&proto.StoreRequest{
+				Credentials: &proto.UserCredentials{
+					Login:    "john",
+					Password: "strongpw",
+				},
+				Type:    "paycard",
+				Name:    "tinkoff",
+				Meta:    `{"valid":true}`,
+				Payload: []byte("4437"),
+			},
+		)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("incorrect auth", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mock.NewMockIStoreUC(ctrl)
+
+		uc.EXPECT().Store(
+			gomock.Any(),
+			gomock.Any(),
+		).Return(entity.ErrAuthFailed)
+
+		grpcsvc := New(&dummyLogger{}, nil, uc)
+
+		_, err := grpcsvc.Store(ctx,
+			&proto.StoreRequest{
+				Credentials: &proto.UserCredentials{},
+			},
+		)
+
+		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+	})
+
+	t.Run("other error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mock.NewMockIStoreUC(ctrl)
+
+		uc.EXPECT().Store(
+			gomock.Any(),
+			gomock.Any(),
+		).Return(errors.New("some other error"))
+
+		grpcsvc := New(&dummyLogger{}, nil, uc)
+
+		_, err := grpcsvc.Store(ctx,
+			&proto.StoreRequest{
+				Credentials: &proto.UserCredentials{},
+			},
+		)
+
+		assert.Equal(t, codes.Internal, status.Code(err))
 	})
 }
