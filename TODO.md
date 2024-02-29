@@ -18,11 +18,13 @@
 
 ## In progress
 
-- [ ] login functionality
+- [ ] client log in gateway
 - [ ] client login
+- [ ] login functionality
 
 ## Done
 
+- [X] client usecase log in
 - [X] client controller login
 - [X] client store token after registration
 - [X] client restore register storage failure test
