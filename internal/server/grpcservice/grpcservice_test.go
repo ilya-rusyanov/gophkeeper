@@ -58,11 +58,12 @@ func TestRegister(t *testing.T) {
 		uc := mock.NewMockIRegisterUC(ctrl)
 
 		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
-			Return(entity.ErrUserAlreadyExists)
+			Return(entity.AuthToken(""), entity.ErrUserAlreadyExists)
 
 		grpcsvc := New(&dummyLogger{}, uc, nil)
 
-		_, err := grpcsvc.Register(ctx,
+		_, err := grpcsvc.Register(
+			ctx,
 			&proto.RegisterRequest{
 				Credentials: &proto.UserCredentials{},
 			})
@@ -77,7 +78,7 @@ func TestRegister(t *testing.T) {
 		uc := mock.NewMockIRegisterUC(ctrl)
 
 		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
-			Return(errors.New("a different error"))
+			Return(entity.AuthToken(""), errors.New("a different error"))
 
 		grpcsvc := New(&dummyLogger{}, uc, nil)
 

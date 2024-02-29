@@ -8,7 +8,6 @@ import (
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
-	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/usercred"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/register"
 	"github.com/ilya-rusyanov/gophkeeper/internal/logger"
 )
@@ -20,18 +19,12 @@ func main() {
 
 	log := logger.MustNew(cfg.LogLevel)
 
-	userCredentialsStorage := usercred.New(
-		log,
-		"username.cfg",
-		"gophkeeper",
-	)
-
 	gophkeeperGateway := gophkeepergw.New(
 		cfg.Server,
+		log,
 	)
 
 	registerUseCase := register.New(
-		userCredentialsStorage,
 		gophkeeperGateway,
 	)
 

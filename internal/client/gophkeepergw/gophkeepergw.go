@@ -6,26 +6,35 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
 
+type Logger interface {
+	Debugf(string, ...any)
+}
+
 // GophKeeperGW is a gateway to the actual service
 type GophKeeperGW struct {
 	serverAddr string
+	log        Logger
 }
 
 // New creates an instance of the gateway
-func New(serverAddr string) *GophKeeperGW {
+func New(serverAddr string, log Logger) *GophKeeperGW {
 	return &GophKeeperGW{
 		serverAddr: serverAddr,
+		log:        log,
 	}
 }
 
 // Register registers new user
 func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials) error {
 	return gk.withConn(func(conn *grpc.ClientConn) error {
+		var header metadata.MD
+
 		c := proto.NewGophkeeperClient(conn)
 
 		arg := proto.RegisterRequest{
@@ -35,10 +44,11 @@ func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials)
 			},
 		}
 
-		_, err := c.Register(ctx, &arg)
+		_, err := c.Register(ctx, &arg, grpc.Header(&header))
 		if err != nil {
 			return fmt.Errorf("server error: %w", err)
 		}
+		gk.log.Debugf("got server header: %q", header)
 
 		return nil
 	})

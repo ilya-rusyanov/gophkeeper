@@ -3,6 +3,7 @@ package register
 import (
 	"context"
 	"testing"
+	"time"
 
 	"go.uber.org/mock/gomock"
 
@@ -31,9 +32,9 @@ func TestRegister(t *testing.T) {
 				"b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
 			))
 
-		reg := New("salt", repo, &dummyLog{})
+		reg := New("salt", repo, &dummyLog{}, time.Second, "")
 
-		err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
+		_, err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
 
 		assert.NoError(t, err)
 	})
@@ -51,9 +52,9 @@ func TestRegister(t *testing.T) {
 				"b8bad5db5f36d0fcd702445eb4d0c6b9f013c38035bba4cef62da2f2cb18b1f9",
 			)).Return(entity.ErrUserAlreadyExists)
 
-		reg := New("salt", repo, &dummyLog{})
+		reg := New("salt", repo, &dummyLog{}, time.Second, "")
 
-		err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
+		_, err := reg.Register(context.Background(), *entity.NewUserCredentials("john", "strongpw"))
 
 		assert.ErrorIs(t, err, entity.ErrUserAlreadyExists)
 	})

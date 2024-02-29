@@ -12,7 +12,6 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/register/mock"
 )
 
-//go:generate mockgen -package mock -destination ./mock/credentials_storager.go . CredentialsStorager
 //go:generate mockgen -package mock -destination ./mock/servicer.go . Servicer
 
 func TestRegister(t *testing.T) {
@@ -26,15 +25,13 @@ func TestRegister(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockCredStorage := mock.NewMockCredentialsStorager(ctrl)
 		mockService := mock.NewMockServicer(ctrl)
 
 		mockService.EXPECT().
 			Register(gomock.Any(), *entity.NewMyCredentials(user, password)).
 			Return(nil)
-		mockCredStorage.EXPECT().Store(*entity.NewMyCredentials(user, password)).Return(nil)
 
-		reg := New(mockCredStorage, mockService)
+		reg := New(mockService)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 		assert.NoError(t, err)
@@ -44,12 +41,11 @@ func TestRegister(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockCredStorage := mock.NewMockCredentialsStorager(ctrl)
 		mockService := mock.NewMockServicer(ctrl)
 
 		mockService.EXPECT().Register(gomock.Any(), *entity.NewMyCredentials(user, password)).Return(someErr)
 
-		reg := New(mockCredStorage, mockService)
+		reg := New(mockService)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 
@@ -58,16 +54,15 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("storage failure", func(t *testing.T) {
+		t.Skip()
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockCredStorage := mock.NewMockCredentialsStorager(ctrl)
 		mockService := mock.NewMockServicer(ctrl)
 
 		mockService.EXPECT().Register(gomock.Any(), *entity.NewMyCredentials(user, password)).Return(nil)
-		mockCredStorage.EXPECT().Store(*entity.NewMyCredentials(user, password)).Return(someErr)
 
-		reg := New(mockCredStorage, mockService)
+		reg := New(mockService)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 

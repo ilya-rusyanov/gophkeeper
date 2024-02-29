@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
@@ -18,7 +20,7 @@ type Logger interface {
 
 // IRegisterUC is registration use case
 type IRegisterUC interface {
-	Register(context.Context, entity.UserCredentials) error
+	Register(context.Context, entity.UserCredentials) (entity.AuthToken, error)
 }
 
 // IStoreUC is store data use case
@@ -49,7 +51,7 @@ func (s *Service) Register(
 ) (*proto.Empty, error) {
 	var res proto.Empty
 
-	err := s.registration.Register(
+	token, err := s.registration.Register(
 		ctx,
 		toUserCredentials(request.Credentials),
 	)
@@ -64,7 +66,14 @@ func (s *Service) Register(
 			fmt.Sprintf("failed to register: %s", err.Error()))
 	}
 
-	s.log.Debugf("incoming register request for %q completed successfully", request.Credentials.Login)
+	header := metadata.New(map[string]string{
+		"token": string(token),
+	})
+	grpc.SendHeader(ctx, header)
+
+	s.log.Debugf(
+		"incoming register request for %q completed successfully",
+		request.Credentials.Login)
 
 	return &res, nil
 }

@@ -4,8 +4,9 @@ import (
 	"context"
 	"os/signal"
 	"syscall"
+	"time"
 
-	log "github.com/ilya-rusyanov/gophkeeper/internal/logger"
+	logging "github.com/ilya-rusyanov/gophkeeper/internal/logger"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
@@ -16,10 +17,12 @@ import (
 )
 
 func main() {
-	config := config.New()
-	config.MustParse()
+	log := logging.MustNew("info")
 
-	log := log.MustNew(config.LogLevel)
+	config := config.New()
+	config.MustParse(log)
+
+	log = logging.MustNew(config.LogLevel)
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
@@ -45,7 +48,13 @@ func main() {
 
 	userRepo := user.New(db)
 
-	registerUC := register.New("TODO: salt", userRepo, log)
+	registerUC := register.New(
+		config.UserPasswordSalt,
+		userRepo,
+		log,
+		time.Duration(config.DefaultTokenLifetime)*time.Second,
+		config.TokenSigningKey,
+	)
 
 	storeUC := store.New()
 

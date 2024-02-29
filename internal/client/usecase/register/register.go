@@ -24,11 +24,6 @@ func (e *GenericError) Error() string {
 	return "generic error: " + e.orig.Error()
 }
 
-// CredentialsStorager represents storage of credentials
-type CredentialsStorager interface {
-	Store(entity.MyCredentials) error
-}
-
 // Servicer is remote service
 type Servicer interface {
 	Register(context.Context, entity.MyCredentials) error
@@ -37,17 +32,14 @@ type Servicer interface {
 // Register is UC for user registration on server
 type Register struct {
 	service Servicer
-	storage CredentialsStorager
 }
 
 // New constructs UC
 func New(
-	credStorage CredentialsStorager,
 	service Servicer,
 ) *Register {
 	return &Register{
 		service: service,
-		storage: credStorage,
 	}
 }
 
@@ -56,12 +48,6 @@ func (r *Register) Register(ctx context.Context, credentials entity.MyCredential
 	if err := r.service.Register(ctx, credentials); err != nil {
 		return NewGenericError(
 			fmt.Errorf("server error: %w", err),
-		)
-	}
-
-	if err := r.storage.Store(credentials); err != nil {
-		return NewGenericError(
-			fmt.Errorf("credentials storage error: %w", err),
 		)
 	}
 

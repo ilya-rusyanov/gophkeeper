@@ -1,25 +1,39 @@
 # TODO
 
+- [ ] client store token after registration
+- [ ] client do not allow to perform anything other then registration without token
+- [ ] server move build token to distinct package
+- [ ] client login
+- [ ] server login returns token
+- [ ] store different credentials functionality
+- [ ] client gw store impl
 - [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
-- [ ] server password salt from config
 - [ ] login functionality
 - [ ] client commandline global flags
 - [ ] prevent user from able to store or load before registering
-- [ ] use same environment variables for client and server
 - [ ] force store functionality (overwrite) client (flag) and server (update)
 - [ ] client error printer for user
 - [ ] log format for client should be plain text and not json
 
 ## In progress
 
-- [ ] store different credentials functionality
-- [ ] client gw store impl
+- [ ] client store token
+- [ ] client restore register storage failure test
 
 ## Done
 
+- [X] client read token on registration
+- [X] client remove credentials storage
+- [X] server controller register returns auth token
+- [X] server default token lifetime from config
+- [X] server token signing key from config
+- [X] use same environment variables for client and server
+- [X] server password salt from config
+- [X] server register usecase returns token
+- [X] credentials storage load impl
 - [X] client store usecase
 - [X] refactor credentials with payload and type
 - [X] rename credentials to record

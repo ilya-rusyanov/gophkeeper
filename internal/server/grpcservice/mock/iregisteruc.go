@@ -41,11 +41,12 @@ func (m *MockIRegisterUC) EXPECT() *MockIRegisterUCMockRecorder {
 }
 
 // Register mocks base method.
-func (m *MockIRegisterUC) Register(arg0 context.Context, arg1 entity.UserCredentials) error {
+func (m *MockIRegisterUC) Register(arg0 context.Context, arg1 entity.UserCredentials) (entity.AuthToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Register", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(entity.AuthToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Register indicates an expected call of Register.

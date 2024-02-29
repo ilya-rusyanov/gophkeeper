@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"golang.org/x/crypto/scrypt"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
 )
 
@@ -21,37 +23,87 @@ type Repository interface {
 
 // UC is registration use case
 type UC struct {
-	salt string
-	repo Repository
-	log  Logger
+	passwordSalt         string
+	repo                 Repository
+	log                  Logger
+	tokenDefaultLifespan time.Duration
+	tokenSigningKey      string
 }
 
 // New constructs registration use case
-func New(salt string, repo Repository, log Logger) *UC {
+func New(
+	passwordSalt string,
+	repo Repository,
+	log Logger,
+	tokenDefaultLifespan time.Duration,
+	tokenSigningKey string,
+) *UC {
 	return &UC{
-		salt: salt,
-		repo: repo,
-		log:  log,
+		passwordSalt:         passwordSalt,
+		repo:                 repo,
+		log:                  log,
+		tokenDefaultLifespan: tokenDefaultLifespan,
+		tokenSigningKey:      tokenSigningKey,
 	}
 }
 
 // Register performs user registration
 func (uc *UC) Register(
 	ctx context.Context, creds entity.UserCredentials,
-) error {
+) (entity.AuthToken, error) {
+	var authToken entity.AuthToken
+
 	// hash password with given salt
-	dk, err := scrypt.Key([]byte(creds.Password), []byte(uc.salt), 32768, 8, 1, 32)
+	dk, err := scrypt.Key(
+		[]byte(creds.Password),
+		[]byte(uc.passwordSalt),
+		32768,
+		8,
+		1,
+		32)
 	if err != nil {
-		return fmt.Errorf("failed to hash password: %w", err)
+		return authToken, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	creds.Password = hex.EncodeToString(dk)
 
 	err = uc.repo.Store(ctx, creds)
 	if err != nil {
-		return fmt.Errorf("repository failed to store credentials: %w", err)
+		return authToken, fmt.Errorf("repository failed to store credentials: %w", err)
 	}
 	uc.log.Debugf("registered new user %q", creds.Login)
 
-	return nil
+	authToken, err = buildAuthToken(
+		uc.tokenDefaultLifespan,
+		creds.Login,
+		uc.tokenSigningKey,
+	)
+	if err != nil {
+		return authToken, fmt.Errorf("failed to build auth token: %w", err)
+	}
+
+	return authToken, nil
+}
+
+func buildAuthToken(
+	expireIn time.Duration, login string, key string,
+) (entity.AuthToken, error) {
+	var result entity.AuthToken
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, entity.TokenClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(
+				time.Now().Add(expireIn)),
+		},
+		Login: login,
+	})
+
+	tokenString, err := token.SignedString([]byte(key))
+	if err != nil {
+		return result, fmt.Errorf("failed to sign token: %w", err)
+	}
+
+	result = entity.AuthToken(tokenString)
+
+	return result, nil
 }
