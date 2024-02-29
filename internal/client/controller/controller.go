@@ -21,7 +21,7 @@ type Registerer interface {
 
 // Storer domain logic of storing data
 type Storer interface {
-	StoreAuth(context.Context, entity.Credentials) error
+	Store(context.Context, *entity.Record) error
 }
 
 // Controller is user controller for interaction with the application

@@ -15,10 +15,12 @@
 ## In progress
 
 - [ ] store different credentials functionality
-- [ ] client store usecase
+- [ ] client gw store auth
 
 ## Done
 
+- [X] refactor credentials with payload and type
+- [X] rename credentials to record
 - [X] test client controller store auth impl
 - [x] test client controller
 - [X] client must output help even if env variable is not set

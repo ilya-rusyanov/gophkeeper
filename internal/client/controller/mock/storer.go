@@ -40,16 +40,16 @@ func (m *MockStorer) EXPECT() *MockStorerMockRecorder {
 	return m.recorder
 }
 
-// StoreAuth mocks base method.
-func (m *MockStorer) StoreAuth(arg0 context.Context, arg1 entity.Credentials) error {
+// Store mocks base method.
+func (m *MockStorer) Store(arg0 context.Context, arg1 *entity.Record) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreAuth", arg0, arg1)
+	ret := m.ctrl.Call(m, "Store", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// StoreAuth indicates an expected call of StoreAuth.
-func (mr *MockStorerMockRecorder) StoreAuth(arg0, arg1 any) *gomock.Call {
+// Store indicates an expected call of Store.
+func (mr *MockStorerMockRecorder) Store(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreAuth", reflect.TypeOf((*MockStorer)(nil).StoreAuth), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*MockStorer)(nil).Store), arg0, arg1)
 }

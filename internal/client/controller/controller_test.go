@@ -62,17 +62,16 @@ func TestController(t *testing.T) {
 
 		stor := mock.NewMockStorer(ctrl)
 
-		stor.EXPECT().StoreAuth(
+		stor.EXPECT().Store(
 			gomock.Any(),
-			entity.Credentials{
-				Name: "yandex mail",
-				Meta: []string{
+			entity.NewAuthRecord(
+				"yandex mail",
+				entity.Meta{
 					"website:mail.ya.ru",
 					"expires:june",
 				},
-				Login:    "john",
-				Password: "strongpw",
-			},
+				entity.NewAuthPayload("john", "strongpw"),
+			),
 		)
 
 		c := New(args(t,
