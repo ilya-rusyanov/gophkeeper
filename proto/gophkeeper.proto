@@ -13,6 +13,10 @@ message RegisterRequest {
   UserCredentials credentials = 1;
 }
 
+message LogInRequest {
+  UserCredentials credentials = 1;
+}
+
 message StoreRequest {
   UserCredentials credentials = 1;
 
@@ -30,5 +34,6 @@ message Empty {
 
 service Gophkeeper {
   rpc Register(RegisterRequest) returns (Empty);
+  rpc LogIn(LogInRequest) returns (Empty);
   rpc Store(StoreRequest) returns (Empty);
 }

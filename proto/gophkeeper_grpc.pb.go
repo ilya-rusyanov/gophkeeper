@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Gophkeeper_Register_FullMethodName = "/gophkeeper.Gophkeeper/Register"
+	Gophkeeper_LogIn_FullMethodName    = "/gophkeeper.Gophkeeper/LogIn"
 	Gophkeeper_Store_FullMethodName    = "/gophkeeper.Gophkeeper/Store"
 )
 
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GophkeeperClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Empty, error)
+	LogIn(ctx context.Context, in *LogInRequest, opts ...grpc.CallOption) (*Empty, error)
 	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -48,6 +50,15 @@ func (c *gophkeeperClient) Register(ctx context.Context, in *RegisterRequest, op
 	return out, nil
 }
 
+func (c *gophkeeperClient) LogIn(ctx context.Context, in *LogInRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Gophkeeper_LogIn_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gophkeeperClient) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, Gophkeeper_Store_FullMethodName, in, out, opts...)
@@ -62,6 +73,7 @@ func (c *gophkeeperClient) Store(ctx context.Context, in *StoreRequest, opts ...
 // for forward compatibility
 type GophkeeperServer interface {
 	Register(context.Context, *RegisterRequest) (*Empty, error)
+	LogIn(context.Context, *LogInRequest) (*Empty, error)
 	Store(context.Context, *StoreRequest) (*Empty, error)
 	mustEmbedUnimplementedGophkeeperServer()
 }
@@ -72,6 +84,9 @@ type UnimplementedGophkeeperServer struct {
 
 func (UnimplementedGophkeeperServer) Register(context.Context, *RegisterRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedGophkeeperServer) LogIn(context.Context, *LogInRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogIn not implemented")
 }
 func (UnimplementedGophkeeperServer) Store(context.Context, *StoreRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
@@ -107,6 +122,24 @@ func _Gophkeeper_Register_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gophkeeper_LogIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogInRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).LogIn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_LogIn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).LogIn(ctx, req.(*LogInRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Gophkeeper_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StoreRequest)
 	if err := dec(in); err != nil {
@@ -135,6 +168,10 @@ var Gophkeeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _Gophkeeper_Register_Handler,
+		},
+		{
+			MethodName: "LogIn",
+			Handler:    _Gophkeeper_LogIn_Handler,
 		},
 		{
 			MethodName: "Store",

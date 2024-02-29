@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] server login returns token
 - [ ] client do not allow to perform anything other then registration or login without token
 - [ ] server move build token to distinct package
 - [ ] store different credentials functionality
@@ -18,12 +17,14 @@
 
 ## In progress
 
-- [ ] client log in gateway
-- [ ] client login
+- [ ] server login returns token
+- [ ] test client login
 - [ ] login functionality
 
 ## Done
 
+- [X] client log in gateway
+- [X] log in proto
 - [X] client usecase log in
 - [X] client controller login
 - [X] client store token after registration

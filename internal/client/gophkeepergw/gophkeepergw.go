@@ -70,6 +70,46 @@ func (gk *GophKeeperGW) Register(
 	return res, nil
 }
 
+// LogIn logs user in
+func (gk *GophKeeperGW) LogIn(
+	ctx context.Context, cred entity.MyCredentials,
+) (entity.MyAuthentication, error) {
+	var res entity.MyAuthentication
+
+	err := gk.withConn(func(conn *grpc.ClientConn) error {
+		var header metadata.MD
+
+		c := proto.NewGophkeeperClient(conn)
+
+		arg := proto.LogInRequest{
+			Credentials: &proto.UserCredentials{
+				Login:    cred.Login,
+				Password: cred.Password,
+			},
+		}
+
+		_, err := c.LogIn(ctx, &arg, grpc.Header(&header))
+		if err != nil {
+			return fmt.Errorf("server error: %w", err)
+		}
+		gk.log.Debugf("got server header: %q", header)
+
+		tokens := header.Get("token")
+		if len(tokens) != 1 {
+			return fmt.Errorf("received %d tokens from server", len(tokens))
+		}
+
+		res = entity.NewMyAuthentication(tokens[0])
+
+		return nil
+	})
+	if err != nil {
+		return res, fmt.Errorf("connection failed: %w", err)
+	}
+
+	return res, nil
+}
+
 func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
 	conn, err := grpc.Dial(
 		gk.serverAddr,
