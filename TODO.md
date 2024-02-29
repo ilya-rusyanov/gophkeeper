@@ -1,10 +1,8 @@
 # TODO
 
-- [ ] client store token after registration
-- [ ] client do not allow to perform anything other then registration without token
-- [ ] server move build token to distinct package
-- [ ] client login
 - [ ] server login returns token
+- [ ] client do not allow to perform anything other then registration or login without token
+- [ ] server move build token to distinct package
 - [ ] store different credentials functionality
 - [ ] client gw store impl
 - [ ] server store usecase
@@ -20,11 +18,14 @@
 
 ## In progress
 
-- [ ] client store token
-- [ ] client restore register storage failure test
+- [ ] login functionality
+- [ ] client login
 
 ## Done
 
+- [X] client controller login
+- [X] client store token after registration
+- [X] client restore register storage failure test
 - [X] client read token on registration
 - [X] client remove credentials storage
 - [X] server controller register returns auth token

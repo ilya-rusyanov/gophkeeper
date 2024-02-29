@@ -13,6 +13,7 @@ import (
 
 //go:generate mockgen -destination ./mock/registerer.go -package mock . Registerer
 //go:generate mockgen -destination ./mock/storer.go -package mock . Storer
+//go:generate mockgen -destination ./mock/loginer.go -package mock . LogIner
 
 func TestReadConfig(t *testing.T) {
 	t.Run("values", func(t *testing.T) {
@@ -56,6 +57,28 @@ func TestController(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("log in", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		login := mock.NewMockLogIner(ctrl)
+
+		login.EXPECT().LogIn(
+			gomock.Any(),
+			*entity.NewMyCredentials("john", "strongpw"),
+		)
+
+		c := New(args(t,
+			"log-in",
+			"--username", "john",
+			"--password", "strongpw",
+		))
+
+		err := c.Run(ctx, WithLogIn(login))
+
+		assert.NoError(t, err)
+	})
+
 	t.Run("store auth", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -70,7 +93,7 @@ func TestController(t *testing.T) {
 					"website:mail.ya.ru",
 					"expires:june",
 				},
-				entity.NewAuthPayload("john", "strongpw"),
+				entity.NewAuthPayload("elon", "twitterx"),
 			),
 		)
 
@@ -80,8 +103,8 @@ func TestController(t *testing.T) {
 			"yandex mail",
 			"--meta", "website:mail.ya.ru",
 			"--meta", "expires:june",
-			"-l", "john",
-			"-p", "strongpw",
+			"-l", "elon",
+			"-p", "twitterx",
 		))
 
 		err := c.Run(ctx, WithStore(stor))

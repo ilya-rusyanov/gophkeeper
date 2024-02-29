@@ -31,8 +31,12 @@ func New(serverAddr string, log Logger) *GophKeeperGW {
 }
 
 // Register registers new user
-func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials) error {
-	return gk.withConn(func(conn *grpc.ClientConn) error {
+func (gk *GophKeeperGW) Register(
+	ctx context.Context, cred entity.MyCredentials,
+) (entity.MyAuthentication, error) {
+	var res entity.MyAuthentication
+
+	err := gk.withConn(func(conn *grpc.ClientConn) error {
 		var header metadata.MD
 
 		c := proto.NewGophkeeperClient(conn)
@@ -50,8 +54,20 @@ func (gk *GophKeeperGW) Register(ctx context.Context, cred entity.MyCredentials)
 		}
 		gk.log.Debugf("got server header: %q", header)
 
+		tokens := header.Get("token")
+		if len(tokens) != 1 {
+			return fmt.Errorf("received %d tokens from server", len(tokens))
+		}
+
+		res = entity.NewMyAuthentication(tokens[0])
+
 		return nil
 	})
+	if err != nil {
+		return res, fmt.Errorf("connection failed: %w", err)
+	}
+
+	return res, nil
 }
 
 func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {

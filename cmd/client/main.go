@@ -8,6 +8,7 @@ import (
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/auth"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/register"
 	"github.com/ilya-rusyanov/gophkeeper/internal/logger"
 )
@@ -24,8 +25,11 @@ func main() {
 		log,
 	)
 
+	myAuthStorage := auth.New("auth.token")
+
 	registerUseCase := register.New(
 		gophkeeperGateway,
+		myAuthStorage,
 	)
 
 	ctrl := controller.New(cmdlineArgs)

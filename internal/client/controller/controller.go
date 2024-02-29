@@ -24,10 +24,16 @@ type Storer interface {
 	Store(context.Context, entity.Record) error
 }
 
+// LogIner is domain logic of loging user in
+type LogIner interface {
+	LogIn(context.Context, entity.MyCredentials) error
+}
+
 // Controller is user controller for interaction with the application
 type Controller struct {
 	cli struct {
 		Register RegisterCmd `cmd:"" help:"Register user"`
+		LogIn    LogInCmd    `cmd:"" help:"Log user in"`
 		Store    StoreCmd    `cmd:"" help:"Store data"`
 		Config   Config      `embed:""`
 	}
@@ -45,9 +51,15 @@ func WithRegister(r Registerer) Opt {
 }
 
 // WithStore specifies Store use case
-func WithStore(r Storer) Opt {
+func WithStore(s Storer) Opt {
 	return func(c *Controller) {
-		c.cli.Store.Auth.uc = r
+		c.cli.Store.Auth.uc = s
+	}
+}
+
+func WithLogIn(l LogIner) Opt {
+	return func(c *Controller) {
+		c.cli.LogIn.uc = l
 	}
 }
 

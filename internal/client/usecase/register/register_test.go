@@ -13,6 +13,7 @@ import (
 )
 
 //go:generate mockgen -package mock -destination ./mock/servicer.go . Servicer
+//go:generate mockgen -package mock -destination ./mock/storager.go . Storager
 
 func TestRegister(t *testing.T) {
 	user := "user"
@@ -26,12 +27,17 @@ func TestRegister(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockService := mock.NewMockServicer(ctrl)
+		mockStorage := mock.NewMockStorager(ctrl)
 
 		mockService.EXPECT().
-			Register(gomock.Any(), *entity.NewMyCredentials(user, password)).
-			Return(nil)
+			Register(gomock.Any(),
+				*entity.NewMyCredentials(user, password)).
+			Return(entity.NewMyAuthentication("auth"), nil)
+		mockStorage.EXPECT().
+			Store(gomock.Any(),
+				entity.NewMyAuthentication("auth"))
 
-		reg := New(mockService)
+		reg := New(mockService, mockStorage)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 		assert.NoError(t, err)
@@ -42,10 +48,14 @@ func TestRegister(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockService := mock.NewMockServicer(ctrl)
+		mockStorage := mock.NewMockStorager(ctrl)
 
-		mockService.EXPECT().Register(gomock.Any(), *entity.NewMyCredentials(user, password)).Return(someErr)
+		mockService.EXPECT().
+			Register(gomock.Any(),
+				*entity.NewMyCredentials(user, password)).
+			Return(entity.NewMyAuthentication(""), someErr)
 
-		reg := New(mockService)
+		reg := New(mockService, mockStorage)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 
@@ -54,15 +64,21 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("storage failure", func(t *testing.T) {
-		t.Skip()
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		mockService := mock.NewMockServicer(ctrl)
+		mockStorage := mock.NewMockStorager(ctrl)
 
-		mockService.EXPECT().Register(gomock.Any(), *entity.NewMyCredentials(user, password)).Return(nil)
+		mockService.EXPECT().
+			Register(gomock.Any(),
+				*entity.NewMyCredentials(user, password))
 
-		reg := New(mockService)
+		mockStorage.EXPECT().
+			Store(gomock.Any(), gomock.Any()).
+			Return(errors.New("storage faulure"))
+
+		reg := New(mockService, mockStorage)
 
 		err := reg.Register(ctx, *entity.NewMyCredentials(user, password))
 
