@@ -64,7 +64,7 @@ func TestController(t *testing.T) {
 
 		stor.EXPECT().Store(
 			gomock.Any(),
-			entity.NewAuthRecord(
+			*entity.NewAuthRecord(
 				"yandex mail",
 				entity.Meta{
 					"website:mail.ya.ru",

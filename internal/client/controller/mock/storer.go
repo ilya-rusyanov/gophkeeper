@@ -41,7 +41,7 @@ func (m *MockStorer) EXPECT() *MockStorerMockRecorder {
 }
 
 // Store mocks base method.
-func (m *MockStorer) Store(arg0 context.Context, arg1 *entity.Record) error {
+func (m *MockStorer) Store(arg0 context.Context, arg1 entity.Record) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Store", arg0, arg1)
 	ret0, _ := ret[0].(error)

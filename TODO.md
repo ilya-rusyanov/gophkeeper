@@ -10,15 +10,17 @@
 - [ ] prevent user from able to store or load before registering
 - [ ] use same environment variables for client and server
 - [ ] force store functionality (overwrite) client (flag) and server (update)
+- [ ] client error printer for user
 - [ ] log format for client should be plain text and not json
 
 ## In progress
 
 - [ ] store different credentials functionality
-- [ ] client gw store auth
+- [ ] client gw store impl
 
 ## Done
 
+- [X] client store usecase
 - [X] refactor credentials with payload and type
 - [X] rename credentials to record
 - [X] test client controller store auth impl

@@ -18,7 +18,7 @@ type StoreAuthCmd struct {
 func (s *StoreAuthCmd) Run(arg *Arg) error {
 	err := s.uc.Store(
 		arg.Context,
-		entity.NewAuthRecord(
+		*entity.NewAuthRecord(
 			s.Name,
 			s.Meta,
 			entity.NewAuthPayload(
