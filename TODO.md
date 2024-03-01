@@ -1,7 +1,6 @@
 # TODO
 
 - [ ] client do not allow to perform anything other then registration or login without token
-- [ ] server move build token to distinct package
 - [ ] server auth interceptor
 - [ ] store different credentials functionality
 - [ ] client gw store impl
@@ -19,12 +18,13 @@
 
 ## In progress
 
-- [ ] server login returns token
-- [ ] test client login
-- [ ] login functionality
+- [ ] client store passes auth
 
 ## Done
 
+- [X] login functionality
+- [X] test client login
+- [X] server login returns token
 - [X] server storage password by id
 - [X] server log in use case test
 - [X] refactor token builder

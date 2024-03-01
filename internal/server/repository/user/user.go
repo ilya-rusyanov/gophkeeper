@@ -51,7 +51,7 @@ func (r *Repo) GetByUsername(
 
 	row := r.db.QueryRowContext(
 		ctx,
-		`SELECT pasword FROM users WHERE login = $1`,
+		`SELECT password FROM users WHERE login = $1`,
 		login,
 	)
 	err := row.Scan(&res)
