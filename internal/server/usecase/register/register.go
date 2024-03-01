@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/pwhash"
 )
 
 type Logger interface {
 	Debugf(string, ...any)
+}
+
+// Tokener builds authentication tokens
+type Tokener interface {
+	Build(lifespan time.Duration, login string) (entity.AuthToken, error)
 }
 
 // Repository stores user credentials
@@ -26,7 +29,7 @@ type UC struct {
 	repo                 Repository
 	log                  Logger
 	tokenDefaultLifespan time.Duration
-	tokenSigningKey      string
+	tokenBuilder         Tokener
 }
 
 // New constructs registration use case
@@ -35,14 +38,14 @@ func New(
 	repo Repository,
 	log Logger,
 	tokenDefaultLifespan time.Duration,
-	tokenSigningKey string,
+	tokenBuilder Tokener,
 ) *UC {
 	return &UC{
 		passwordSalt:         passwordSalt,
 		repo:                 repo,
 		log:                  log,
 		tokenDefaultLifespan: tokenDefaultLifespan,
-		tokenSigningKey:      tokenSigningKey,
+		tokenBuilder:         tokenBuilder,
 	}
 }
 
@@ -66,37 +69,13 @@ func (uc *UC) Register(
 	}
 	uc.log.Debugf("registered new user %q", creds.Login)
 
-	authToken, err = buildAuthToken(
+	authToken, err = uc.tokenBuilder.Build(
 		uc.tokenDefaultLifespan,
 		creds.Login,
-		uc.tokenSigningKey,
 	)
 	if err != nil {
 		return authToken, fmt.Errorf("failed to build auth token: %w", err)
 	}
 
 	return authToken, nil
-}
-
-func buildAuthToken(
-	expireIn time.Duration, login string, key string,
-) (entity.AuthToken, error) {
-	var result entity.AuthToken
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, entity.TokenClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(
-				time.Now().Add(expireIn)),
-		},
-		Login: login,
-	})
-
-	tokenString, err := token.SignedString([]byte(key))
-	if err != nil {
-		return result, fmt.Errorf("failed to sign token: %w", err)
-	}
-
-	result = entity.AuthToken(tokenString)
-
-	return result, nil
 }

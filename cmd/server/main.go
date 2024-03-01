@@ -4,7 +4,6 @@ import (
 	"context"
 	"os/signal"
 	"syscall"
-	"time"
 
 	logging "github.com/ilya-rusyanov/gophkeeper/internal/logger"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
@@ -12,8 +11,10 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/postgres"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/login"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/register"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/store"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/token"
 )
 
 func main() {
@@ -46,14 +47,23 @@ func main() {
 		}
 	}()
 
+	tokenBuilder := token.NewBuilder(config.TokenSigningKey)
+
 	userRepo := user.New(db)
 
 	registerUC := register.New(
 		config.UserPasswordSalt,
 		userRepo,
 		log,
-		time.Duration(config.DefaultTokenLifetime)*time.Second,
-		config.TokenSigningKey,
+		config.DefaultTokenLifetime,
+		tokenBuilder,
+	)
+
+	logInUC := login.New(
+		userRepo,
+		config.UserPasswordSalt,
+		tokenBuilder,
+		config.DefaultTokenLifetime,
 	)
 
 	storeUC := store.New()
@@ -61,6 +71,7 @@ func main() {
 	grpcService := grpcservice.New(
 		log,
 		registerUC,
+		logInUC,
 		storeUC,
 	)
 

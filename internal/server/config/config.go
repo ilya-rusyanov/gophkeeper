@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Logger interface {
@@ -17,8 +18,9 @@ type Config struct {
 	DSN                  string
 	Secure               bool
 	UserPasswordSalt     string
-	DefaultTokenLifetime int
+	DefaultTokenLifetime time.Duration
 	TokenSigningKey      string
+	tokenLifeSec         int
 }
 
 // New constructs configuration
@@ -30,7 +32,7 @@ func New() *Config {
 	flag.StringVar(&res.LogLevel, "l", "info", "log level")
 	flag.BoolVar(&res.Secure, "s", false, "enable HTTPS")
 	flag.StringVar(&res.UserPasswordSalt, "user-password-salt", "6OpOisIp", "salt for hashing user passwords")
-	flag.IntVar(&res.DefaultTokenLifetime, "token-lifetime", 5*60, "default lifetime for user authentication token")
+	flag.IntVar(&res.tokenLifeSec, "token-lifetime", 5*60, "default lifetime for user authentication token")
 	flag.StringVar(&res.TokenSigningKey, "token-signing-key", "Twot3QuiOp", "signing key for user token")
 
 	return &res
@@ -62,11 +64,12 @@ func (c *Config) MustParse(log Logger) {
 
 	if val := os.Getenv("DEFAULT_TOKEN_LIFETIME"); len(val) > 0 {
 		var err error
-		c.DefaultTokenLifetime, err = strconv.Atoi(val)
+		c.tokenLifeSec, err = strconv.Atoi(val)
 		if err != nil {
 			log.Fatalf("failed to read default token lifetime from environment variable: %s", err.Error())
 		}
 	}
+	c.DefaultTokenLifetime = time.Duration(c.tokenLifeSec) * time.Second
 
 	if val := os.Getenv("TOKEN_SIGNING_KEY"); len(val) > 0 {
 		c.TokenSigningKey = val

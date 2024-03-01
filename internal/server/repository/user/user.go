@@ -42,3 +42,25 @@ VALUES($1, $2)`, creds.Login, creds.Password)
 
 	return nil
 }
+
+// GetByUserName returns password by user's name
+func (r *Repo) GetByUsername(
+	ctx context.Context, login string,
+) (string, error) {
+	var res string
+
+	row := r.db.QueryRowContext(
+		ctx,
+		`SELECT pasword FROM users WHERE login = $1`,
+		login,
+	)
+	err := row.Scan(&res)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return res, entity.ErrNoSuchUser
+	case err != nil:
+		return res, fmt.Errorf("unexpected database error: %w", err)
+	}
+
+	return res, nil
+}

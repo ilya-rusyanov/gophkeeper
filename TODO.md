@@ -2,6 +2,7 @@
 
 - [ ] client do not allow to perform anything other then registration or login without token
 - [ ] server move build token to distinct package
+- [ ] server auth interceptor
 - [ ] store different credentials functionality
 - [ ] client gw store impl
 - [ ] server store usecase
@@ -18,13 +19,15 @@
 
 ## In progress
 
-- [ ] server log in use case test
 - [ ] server login returns token
 - [ ] test client login
 - [ ] login functionality
 
 ## Done
 
+- [X] server storage password by id
+- [X] server log in use case test
+- [X] refactor token builder
 - [X] refactor password hashing code
 - [X] server log in grpcservice impl
 - [X] client log in gateway
