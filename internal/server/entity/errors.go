@@ -7,4 +7,8 @@ var (
 	ErrUserAlreadyExists = errors.New("user already exists")
 	// ErrAuthFailed means that user failed to pass auth
 	ErrAuthFailed = errors.New("authentication failure")
+	// ErrNoSuchUser means user not found
+	ErrNoSuchUser = errors.New("no such user")
+	// ErrWrongPassword means password does not match
+	ErrWrongPassword = errors.New("wrong password")
 )

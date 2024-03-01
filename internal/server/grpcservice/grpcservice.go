@@ -23,6 +23,11 @@ type IRegisterUC interface {
 	Register(context.Context, entity.UserCredentials) (entity.AuthToken, error)
 }
 
+// LogIner is log in use case
+type LogIner interface {
+	LogIn(context.Context, entity.UserCredentials) (entity.AuthToken, error)
+}
+
 // IStoreUC is store data use case
 type IStoreUC interface {
 	Store(context.Context, *entity.StoreIn) error
@@ -33,14 +38,21 @@ type Service struct {
 	proto.UnimplementedGophkeeperServer
 	log          Logger
 	registration IRegisterUC
+	login        LogIner
 	store        IStoreUC
 }
 
 // New constructs Service
-func New(log Logger, reg IRegisterUC, store IStoreUC) *Service {
+func New(
+	log Logger,
+	reg IRegisterUC,
+	login LogIner,
+	store IStoreUC,
+) *Service {
 	return &Service{
 		log:          log,
 		registration: reg,
+		login:        login,
 		store:        store,
 	}
 }
@@ -73,6 +85,43 @@ func (s *Service) Register(
 
 	s.log.Debugf(
 		"incoming register request for %q completed successfully",
+		request.Credentials.Login)
+
+	return &res, nil
+}
+
+// LogIn is log user in endpoint
+func (s *Service) LogIn(
+	ctx context.Context, request *proto.LogInRequest,
+) (*proto.Empty, error) {
+	var res proto.Empty
+
+	token, err := s.login.LogIn(
+		ctx,
+		toUserCredentials(request.Credentials),
+	)
+	switch {
+	case errors.Is(err, entity.ErrNoSuchUser):
+		return nil, status.Error(
+			codes.NotFound,
+			"user not found")
+	case errors.Is(err, entity.ErrWrongPassword):
+		return nil, status.Error(
+			codes.Unauthenticated,
+			"user not found")
+	case err != nil:
+		return nil, status.Error(
+			codes.Internal,
+			fmt.Sprintf("failed to log in: %s", err.Error()))
+	}
+
+	header := metadata.New(map[string]string{
+		"token": string(token),
+	})
+	grpc.SendHeader(ctx, header)
+
+	s.log.Debugf(
+		"incoming log in request for %q completed successfully",
 		request.Credentials.Login)
 
 	return &res, nil

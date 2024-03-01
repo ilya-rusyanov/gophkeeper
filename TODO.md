@@ -23,6 +23,7 @@
 
 ## Done
 
+- [X] server log in grpcservice impl
 - [X] client log in gateway
 - [X] log in proto
 - [X] client usecase log in
