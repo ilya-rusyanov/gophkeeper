@@ -14,15 +14,18 @@
 - [ ] force store functionality (overwrite) client (flag) and server (update)
 - [ ] client error printer for user
 - [ ] log format for client should be plain text and not json
+- [ ] password salt must be unique for each user
 
 ## In progress
 
+- [ ] server log in use case test
 - [ ] server login returns token
 - [ ] test client login
 - [ ] login functionality
 
 ## Done
 
+- [X] refactor password hashing code
 - [X] server log in grpcservice impl
 - [X] client log in gateway
 - [X] log in proto

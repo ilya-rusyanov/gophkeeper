@@ -2,14 +2,13 @@ package register
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"time"
 
-	"golang.org/x/crypto/scrypt"
-
 	"github.com/golang-jwt/jwt/v4"
+
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/pwhash"
 )
 
 type Logger interface {
@@ -51,21 +50,15 @@ func New(
 func (uc *UC) Register(
 	ctx context.Context, creds entity.UserCredentials,
 ) (entity.AuthToken, error) {
-	var authToken entity.AuthToken
+	var (
+		authToken entity.AuthToken
+		err       error
+	)
 
-	// hash password with given salt
-	dk, err := scrypt.Key(
-		[]byte(creds.Password),
-		[]byte(uc.passwordSalt),
-		32768,
-		8,
-		1,
-		32)
+	creds.Password, err = pwhash.Hash(uc.passwordSalt, creds.Password)
 	if err != nil {
 		return authToken, fmt.Errorf("failed to hash password: %w", err)
 	}
-
-	creds.Password = hex.EncodeToString(dk)
 
 	err = uc.repo.Store(ctx, creds)
 	if err != nil {
