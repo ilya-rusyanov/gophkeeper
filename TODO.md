@@ -2,8 +2,6 @@
 
 - [ ] client do not allow to perform anything other then registration or login without token
 - [ ] store different credentials functionality
-- [ ] client gw store impl
-- [ ] server store usecase
 - [ ] load different credentials functionality
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
@@ -17,10 +15,11 @@
 
 ## In progress
 
-- [ ] server auth interceptor
+- [ ] server store usecase
 
 ## Done
 
+- [X] server auth interceptor
 - [X] client store passes auth
 - [X] login functionality
 - [X] test client login

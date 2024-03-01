@@ -8,6 +8,7 @@ import (
 	logging "github.com/ilya-rusyanov/gophkeeper/internal/logger"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/config"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver/interceptor"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/postgres"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
@@ -75,7 +76,16 @@ func main() {
 		storeUC,
 	)
 
-	grpcServer, err := grpcserver.New(config.ListenAddr, grpcService, log)
+	grpcServer, err := grpcserver.New(
+		config.ListenAddr,
+		grpcService,
+		log,
+		interceptor.Auth(
+			config.TokenSigningKey,
+			"/gophkeeper.Gophkeeper/Register",
+			"/gophkeeper.Gophkeeper/LogIn",
+		),
+	)
 	if err != nil {
 		log.Fatalf("failed to create gRPC server: %s", err.Error())
 	}

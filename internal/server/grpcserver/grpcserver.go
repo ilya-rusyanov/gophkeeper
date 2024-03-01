@@ -23,7 +23,10 @@ type Server struct {
 
 // New constructs gRPC server
 func New(
-	listenAddr string, service proto.GophkeeperServer, logger Logger,
+	listenAddr string,
+	service proto.GophkeeperServer,
+	logger Logger,
+	options ...grpc.ServerOption,
 ) (*Server, error) {
 	var err error
 
@@ -37,7 +40,7 @@ func New(
 		return nil, fmt.Errorf("failed to start listener: %w", err)
 	}
 
-	res.server = grpc.NewServer()
+	res.server = grpc.NewServer(options...)
 
 	proto.RegisterGophkeeperServer(res.server, service)
 
