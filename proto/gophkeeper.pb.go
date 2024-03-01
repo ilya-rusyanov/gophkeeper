@@ -174,11 +174,10 @@ type StoreRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Credentials *UserCredentials `protobuf:"bytes,1,opt,name=credentials,proto3" json:"credentials,omitempty"`
-	Type        string           `protobuf:"bytes,10,opt,name=type,proto3" json:"type,omitempty"`
-	Name        string           `protobuf:"bytes,20,opt,name=name,proto3" json:"name,omitempty"`
-	Meta        string           `protobuf:"bytes,30,opt,name=meta,proto3" json:"meta,omitempty"`
-	Payload     []byte           `protobuf:"bytes,40,opt,name=payload,proto3" json:"payload,omitempty"`
+	Type    string `protobuf:"bytes,10,opt,name=type,proto3" json:"type,omitempty"`
+	Name    string `protobuf:"bytes,20,opt,name=name,proto3" json:"name,omitempty"`
+	Meta    string `protobuf:"bytes,30,opt,name=meta,proto3" json:"meta,omitempty"`
+	Payload []byte `protobuf:"bytes,40,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
 func (x *StoreRequest) Reset() {
@@ -211,13 +210,6 @@ func (x *StoreRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use StoreRequest.ProtoReflect.Descriptor instead.
 func (*StoreRequest) Descriptor() ([]byte, []int) {
 	return file_gophkeeper_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *StoreRequest) GetCredentials() *UserCredentials {
-	if x != nil {
-		return x.Credentials
-	}
-	return nil
 }
 
 func (x *StoreRequest) GetType() string {
@@ -305,12 +297,8 @@ var file_gophkeeper_proto_rawDesc = []byte{
 	0x69, 0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x70,
 	0x68, 0x6b, 0x65, 0x65, 0x70, 0x65, 0x72, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x43, 0x72, 0x65, 0x64,
 	0x65, 0x6e, 0x74, 0x69, 0x61, 0x6c, 0x73, 0x52, 0x0b, 0x63, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74,
-	0x69, 0x61, 0x6c, 0x73, 0x22, 0xa3, 0x01, 0x0a, 0x0c, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3d, 0x0a, 0x0b, 0x63, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74,
-	0x69, 0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x70,
-	0x68, 0x6b, 0x65, 0x65, 0x70, 0x65, 0x72, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x43, 0x72, 0x65, 0x64,
-	0x65, 0x6e, 0x74, 0x69, 0x61, 0x6c, 0x73, 0x52, 0x0b, 0x63, 0x72, 0x65, 0x64, 0x65, 0x6e, 0x74,
-	0x69, 0x61, 0x6c, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x0a, 0x20, 0x01,
+	0x69, 0x61, 0x6c, 0x73, 0x22, 0x64, 0x0a, 0x0c, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x0a, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
 	0x18, 0x14, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04,
 	0x6d, 0x65, 0x74, 0x61, 0x18, 0x1e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x65, 0x74, 0x61,
@@ -355,18 +343,17 @@ var file_gophkeeper_proto_goTypes = []interface{}{
 var file_gophkeeper_proto_depIdxs = []int32{
 	0, // 0: gophkeeper.RegisterRequest.credentials:type_name -> gophkeeper.UserCredentials
 	0, // 1: gophkeeper.LogInRequest.credentials:type_name -> gophkeeper.UserCredentials
-	0, // 2: gophkeeper.StoreRequest.credentials:type_name -> gophkeeper.UserCredentials
-	1, // 3: gophkeeper.Gophkeeper.Register:input_type -> gophkeeper.RegisterRequest
-	2, // 4: gophkeeper.Gophkeeper.LogIn:input_type -> gophkeeper.LogInRequest
-	3, // 5: gophkeeper.Gophkeeper.Store:input_type -> gophkeeper.StoreRequest
-	4, // 6: gophkeeper.Gophkeeper.Register:output_type -> gophkeeper.Empty
-	4, // 7: gophkeeper.Gophkeeper.LogIn:output_type -> gophkeeper.Empty
-	4, // 8: gophkeeper.Gophkeeper.Store:output_type -> gophkeeper.Empty
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 2: gophkeeper.Gophkeeper.Register:input_type -> gophkeeper.RegisterRequest
+	2, // 3: gophkeeper.Gophkeeper.LogIn:input_type -> gophkeeper.LogInRequest
+	3, // 4: gophkeeper.Gophkeeper.Store:input_type -> gophkeeper.StoreRequest
+	4, // 5: gophkeeper.Gophkeeper.Register:output_type -> gophkeeper.Empty
+	4, // 6: gophkeeper.Gophkeeper.LogIn:output_type -> gophkeeper.Empty
+	4, // 7: gophkeeper.Gophkeeper.Store:output_type -> gophkeeper.Empty
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_gophkeeper_proto_init() }

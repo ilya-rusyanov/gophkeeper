@@ -2,17 +2,17 @@ package entity
 
 // ServiceStoreRequest is a request to remote service for data storage
 type ServiceStoreRequest struct {
-	UserCredentials MyCredentials
-	Record          Record
+	AuthData MyAuthentication
+	Record   Record
 }
 
 // NewServiceStoreRequest constructs the request
 func NewServiceStoreRequest(
-	cred MyCredentials,
+	auth MyAuthentication,
 	rec Record,
 ) *ServiceStoreRequest {
 	return &ServiceStoreRequest{
-		UserCredentials: cred,
-		Record:          rec,
+		AuthData: auth,
+		Record:   rec,
 	}
 }

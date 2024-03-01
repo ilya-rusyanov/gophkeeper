@@ -1,7 +1,6 @@
 # TODO
 
 - [ ] client do not allow to perform anything other then registration or login without token
-- [ ] server auth interceptor
 - [ ] store different credentials functionality
 - [ ] client gw store impl
 - [ ] server store usecase
@@ -18,10 +17,11 @@
 
 ## In progress
 
-- [ ] client store passes auth
+- [ ] server auth interceptor
 
 ## Done
 
+- [X] client store passes auth
 - [X] login functionality
 - [X] test client login
 - [X] server login returns token

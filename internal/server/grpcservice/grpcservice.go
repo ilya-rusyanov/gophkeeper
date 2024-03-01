@@ -36,10 +36,10 @@ type IStoreUC interface {
 // Service is a gophkeeper gRPC service
 type Service struct {
 	proto.UnimplementedGophkeeperServer
-	log          Logger
-	registration IRegisterUC
-	login        LogIner
-	store        IStoreUC
+	log            Logger
+	registrationUC IRegisterUC
+	loginUC        LogIner
+	storeUC        IStoreUC
 }
 
 // New constructs Service
@@ -50,10 +50,10 @@ func New(
 	store IStoreUC,
 ) *Service {
 	return &Service{
-		log:          log,
-		registration: reg,
-		login:        login,
-		store:        store,
+		log:            log,
+		registrationUC: reg,
+		loginUC:        login,
+		storeUC:        store,
 	}
 }
 
@@ -63,7 +63,7 @@ func (s *Service) Register(
 ) (*proto.Empty, error) {
 	var res proto.Empty
 
-	token, err := s.registration.Register(
+	token, err := s.registrationUC.Register(
 		ctx,
 		toUserCredentials(request.Credentials),
 	)
@@ -96,7 +96,7 @@ func (s *Service) LogIn(
 ) (*proto.Empty, error) {
 	var res proto.Empty
 
-	token, err := s.login.LogIn(
+	token, err := s.loginUC.LogIn(
 		ctx,
 		toUserCredentials(request.Credentials),
 	)
@@ -108,7 +108,7 @@ func (s *Service) LogIn(
 	case errors.Is(err, entity.ErrWrongPassword):
 		return nil, status.Error(
 			codes.Unauthenticated,
-			"user not found")
+			"wrong password")
 	case err != nil:
 		return nil, status.Error(
 			codes.Internal,
@@ -133,10 +133,10 @@ func (s *Service) Store(
 ) (*proto.Empty, error) {
 	var res proto.Empty
 
-	err := s.store.Store(
+	err := s.storeUC.Store(
 		ctx,
 		entity.NewStoreIn(
-			toUserCredentials(request.Credentials),
+			*entity.NewUserCredentials("", ""),
 			request.Type,
 			request.Name,
 			request.Meta,

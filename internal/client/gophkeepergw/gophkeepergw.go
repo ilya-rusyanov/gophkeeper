@@ -2,7 +2,9 @@ package gophkeepergw
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -42,10 +44,7 @@ func (gk *GophKeeperGW) Register(
 		c := proto.NewGophkeeperClient(conn)
 
 		arg := proto.RegisterRequest{
-			Credentials: &proto.UserCredentials{
-				Login:    cred.Login,
-				Password: cred.Password,
-			},
+			Credentials: toProtoCredentials(cred),
 		}
 
 		_, err := c.Register(ctx, &arg, grpc.Header(&header))
@@ -110,13 +109,49 @@ func (gk *GophKeeperGW) LogIn(
 	return res, nil
 }
 
+// Store stores given data
+func (gk *GophKeeperGW) Store(
+	ctx context.Context, in entity.ServiceStoreRequest,
+) error {
+	return gk.withConn(func(conn *grpc.ClientConn) error {
+		c := proto.NewGophkeeperClient(conn)
+
+		md := metadata.Pairs("auth", string(in.AuthData))
+		authCtx := metadata.NewOutgoingContext(ctx, md)
+
+		protoMeta, err := toProtoMeta(in.Record.Meta)
+		if err != nil {
+			return fmt.Errorf("failed to convert meta info to proto: %w", err)
+		}
+
+		protoPayload, err := toProtoPayload(in.Record.Payload)
+		if err != nil {
+			return fmt.Errorf("failed to convert payload to proto: %w", err)
+		}
+
+		arg := proto.StoreRequest{
+			Type: string(in.Record.Type),
+			Name:  in.Record.Name,
+			Meta:protoMeta,
+			Payload:protoPayload,
+		}
+
+		_, err = c.Store(authCtx, &arg)
+		if err != nil {
+			return fmt.Errorf("server failed to store data: %w", err)
+		}
+
+		return nil
+	})
+}
+
 func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
 	conn, err := grpc.Dial(
 		gk.serverAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		return fmt.Errorf("failed to dial to server: %w", err)
+		return fmt.Errorf("failed to dial server: %w", err)
 	}
 	defer conn.Close()
 
@@ -126,4 +161,31 @@ func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
 	}
 
 	return nil
+}
+
+func toProtoCredentials(in entity.MyCredentials) *proto.UserCredentials {
+	return &proto.UserCredentials{
+		Login:    in.Login,
+		Password: in.Password,
+	}
+}
+
+func toProtoMeta(in entity.Meta) (string, error) {
+	sb := strings.Builder{}
+
+	err := json.NewEncoder(&sb).Encode(&in)
+	if err != nil {
+		return "", fmt.Errorf("json encoder failed to encode meta: %w", err)
+	}
+
+	return sb.String(), nil
+}
+
+func toProtoPayload(in any) ([]byte, error) {
+	res, err := json.Marshal(in)
+	if err != nil {
+		return res, fmt.Errorf("failed to encode payload to json: %w", err)
+	}
+
+	return res, nil
 }

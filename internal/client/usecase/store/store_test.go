@@ -11,7 +11,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/store/mock"
 )
 
-//go:generate mockgen -destination ./mock/cred_storager.go -package mock . CredStorager
+//go:generate mockgen -destination ./mock/auth_storager.go -package mock . AuthStorager
 //go:generate mockgen -destination ./mock/servicer.go -package mock . Servicer
 
 func TestStore(t *testing.T) {
@@ -21,17 +21,19 @@ func TestStore(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		credRepo := mock.NewMockCredStorager(ctrl)
+		authRepo := mock.NewMockAuthStorager(ctrl)
 		service := mock.NewMockServicer(ctrl)
 
-		credRepo.EXPECT().
+		authRepo.EXPECT().
 			Load().
-			Return(*entity.NewMyCredentials("john", "strongpw"), nil)
+			Return(entity.NewMyAuthentication("auth"), nil)
 
 		service.EXPECT().
 			Store(gomock.Any(),
 				*entity.NewServiceStoreRequest(
-					*entity.NewMyCredentials("john", "strongpw"),
+					entity.NewMyAuthentication(
+						"auth",
+					),
 					*entity.NewAuthRecord(
 						"yandex mail",
 						entity.Meta{"expires:july"},
@@ -40,7 +42,7 @@ func TestStore(t *testing.T) {
 				),
 			)
 
-		uc := New(credRepo, service)
+		uc := New(authRepo, service)
 
 		err := uc.Store(ctx,
 			*entity.NewAuthRecord(

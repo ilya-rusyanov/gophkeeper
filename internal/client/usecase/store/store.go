@@ -7,9 +7,9 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
-// CredStorager is storage of user's own credentials
-type CredStorager interface {
-	Load() (entity.MyCredentials, error)
+// AuthStorager is storage of user's own credentials
+type AuthStorager interface {
+	Load() (entity.MyAuthentication, error)
 }
 
 // Servicer is gophkeeper service gateway
@@ -19,14 +19,14 @@ type Servicer interface {
 
 // UC is data storing use case
 type UC struct {
-	credStorage CredStorager
+	authStorage AuthStorager
 	service     Servicer
 }
 
 // New constructs the use case
-func New(credStore CredStorager, service Servicer) *UC {
+func New(authStorage AuthStorager, service Servicer) *UC {
 	return &UC{
-		credStorage: credStore,
+		authStorage: authStorage,
 		service:     service,
 	}
 }
@@ -35,14 +35,14 @@ func New(credStore CredStorager, service Servicer) *UC {
 func (uc *UC) Store(
 	ctx context.Context, rec entity.Record,
 ) error {
-	cred, err := uc.credStorage.Load()
+	auth, err := uc.authStorage.Load()
 	if err != nil {
-		return fmt.Errorf("failed to load user credentials: %w", err)
+		return fmt.Errorf("failed to load auth data: %w", err)
 	}
 
 	err = uc.service.Store(ctx,
 		*entity.NewServiceStoreRequest(
-			cred, rec,
+			auth, rec,
 		),
 	)
 	if err != nil {
