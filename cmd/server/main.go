@@ -11,6 +11,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver/interceptor"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/postgres"
+	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/data"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/repository/user"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/login"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/usecase/register"
@@ -52,6 +53,8 @@ func main() {
 
 	userRepo := user.New(db)
 
+	dataRepo := data.New(db)
+
 	registerUC := register.New(
 		config.UserPasswordSalt,
 		userRepo,
@@ -67,7 +70,7 @@ func main() {
 		config.DefaultTokenLifetime,
 	)
 
-	storeUC := store.New()
+	storeUC := store.New(dataRepo)
 
 	grpcService := grpcservice.New(
 		log,

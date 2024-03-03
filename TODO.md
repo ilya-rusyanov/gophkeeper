@@ -1,8 +1,11 @@
 # TODO
 
-- [ ] client do not allow to perform anything other then registration or login without token
-- [ ] store different credentials functionality
 - [ ] load different credentials functionality
+- [ ] store arbitrary text
+- [ ] store binary
+- [ ] store cards
+- [ ] server data encryption (master password)
+- [ ] client do not allow to perform anything other then registration or login without token
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
 - [ ] login functionality
@@ -15,10 +18,16 @@
 
 ## In progress
 
-- [ ] server store usecase
+- [ ] list data functionality
 
 ## Done
 
+- [X] store different credentials functionality
+- [X] server stores data to database
+- [X] server grpcservice test err record already exists
+- [X] fix server grpcservice test
+- [X] server data migration
+- [X] simple server store usecase
 - [X] server auth interceptor
 - [X] client store passes auth
 - [X] login functionality

@@ -11,4 +11,6 @@ var (
 	ErrNoSuchUser = errors.New("no such user")
 	// ErrWrongPassword means password does not match
 	ErrWrongPassword = errors.New("wrong password")
+	// ErrRecordAlreadyExists when such data record is already present
+	ErrRecordAlreadyExists = errors.New("record already exists")
 )

@@ -130,10 +130,10 @@ func (gk *GophKeeperGW) Store(
 		}
 
 		arg := proto.StoreRequest{
-			Type: string(in.Record.Type),
-			Name:  in.Record.Name,
-			Meta:protoMeta,
-			Payload:protoPayload,
+			Type:    string(in.Record.Type),
+			Name:    in.Record.Name,
+			Meta:    protoMeta,
+			Payload: protoPayload,
 		}
 
 		_, err = c.Store(authCtx, &arg)

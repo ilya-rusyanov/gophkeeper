@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
+	grpcctx "github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver/context"
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
 
@@ -133,10 +134,12 @@ func (s *Service) Store(
 ) (*proto.Empty, error) {
 	var res proto.Empty
 
+	login := ctx.Value(grpcctx.ContextKeyLogin).(string)
+
 	err := s.storeUC.Store(
 		ctx,
 		entity.NewStoreIn(
-			*entity.NewUserCredentials("", ""),
+			login,
 			request.Type,
 			request.Name,
 			request.Meta,
@@ -148,6 +151,10 @@ func (s *Service) Store(
 		return nil, status.Error(
 			codes.Unauthenticated,
 			fmt.Sprintf("auth failed: %s", err.Error()))
+	case errors.Is(err, entity.ErrRecordAlreadyExists):
+		return nil, status.Error(
+			codes.AlreadyExists,
+			"record already exists")
 	case err != nil:
 		return nil, status.Error(
 			codes.Internal,

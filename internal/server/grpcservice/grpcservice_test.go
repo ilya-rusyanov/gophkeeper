@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/entity"
+	grpcctx "github.com/ilya-rusyanov/gophkeeper/internal/server/grpcserver/context"
 	"github.com/ilya-rusyanov/gophkeeper/internal/server/grpcservice/mock"
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
@@ -179,7 +180,7 @@ func TestStore(t *testing.T) {
 		uc.EXPECT().Store(
 			gomock.Any(),
 			entity.NewStoreIn(
-				*entity.NewUserCredentials("john", "strongpw"),
+				"john",
 				"paycard",
 				"tinkoff",
 				`{"valid":true}`,
@@ -189,12 +190,10 @@ func TestStore(t *testing.T) {
 
 		grpcsvc := New(&dummyLogger{}, nil, nil, uc)
 
-		_, err := grpcsvc.Store(ctx,
+		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
+
+		_, err := grpcsvc.Store(ctxVal,
 			&proto.StoreRequest{
-				Credentials: &proto.UserCredentials{
-					Login:    "john",
-					Password: "strongpw",
-				},
 				Type:    "paycard",
 				Name:    "tinkoff",
 				Meta:    `{"valid":true}`,
@@ -205,7 +204,7 @@ func TestStore(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("incorrect auth", func(t *testing.T) {
+	t.Run("record already exists", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -214,17 +213,15 @@ func TestStore(t *testing.T) {
 		uc.EXPECT().Store(
 			gomock.Any(),
 			gomock.Any(),
-		).Return(entity.ErrAuthFailed)
+		).Return(entity.ErrRecordAlreadyExists)
 
 		grpcsvc := New(&dummyLogger{}, nil, nil, uc)
 
-		_, err := grpcsvc.Store(ctx,
-			&proto.StoreRequest{
-				Credentials: &proto.UserCredentials{},
-			},
-		)
+		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
 
-		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+		_, err := grpcsvc.Store(ctxVal, &proto.StoreRequest{})
+
+		assert.Equal(t, codes.AlreadyExists, status.Code(err))
 	})
 
 	t.Run("other error", func(t *testing.T) {
@@ -240,11 +237,9 @@ func TestStore(t *testing.T) {
 
 		grpcsvc := New(&dummyLogger{}, nil, nil, uc)
 
-		_, err := grpcsvc.Store(ctx,
-			&proto.StoreRequest{
-				Credentials: &proto.UserCredentials{},
-			},
-		)
+		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
+
+		_, err := grpcsvc.Store(ctxVal, &proto.StoreRequest{})
 
 		assert.Equal(t, codes.Internal, status.Code(err))
 	})

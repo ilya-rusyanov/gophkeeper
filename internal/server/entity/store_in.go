@@ -2,8 +2,8 @@ package entity
 
 // StoreIn is carrier of store use case arguments
 type StoreIn struct {
-	// Credentials depicts credentials of the user who submits store request
-	Credentials UserCredentials
+	// Login is user's login
+	Login string
 	// Type is the type of data being submitted
 	Type string
 	// Name is the title of the data that is being submitted
@@ -16,17 +16,17 @@ type StoreIn struct {
 
 // NewStoreIn creates and initializes StoreIn
 func NewStoreIn(
-	creds UserCredentials,
+	login string,
 	typ,
 	name,
 	meta string,
 	payload []byte,
 ) *StoreIn {
 	return &StoreIn{
-		Credentials: creds,
-		Type:        typ,
-		Name:        name,
-		Meta:        meta,
-		Payload:     payload,
+		Login:   login,
+		Type:    typ,
+		Name:    name,
+		Meta:    meta,
+		Payload: payload,
 	}
 }
