@@ -13,10 +13,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
-//go:generate mockgen -destination ./mock/registerer.go -package mock . Registerer
-//go:generate mockgen -destination ./mock/storer.go -package mock . Storer
-//go:generate mockgen -destination ./mock/loginer.go -package mock . LogIner
-//go:generate mockgen -destination ./mock/lister.go -package mock . Lister
+//go:generate mockgen -destination ./mock/mocks.go -package mock . Registerer,Storer,LogIner,Lister,Shower
 
 func TestReadConfig(t *testing.T) {
 	t.Run("values", func(t *testing.T) {
@@ -145,6 +142,53 @@ func TestController(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, `auth	"yandex"
 card	"tinkoff"
+`, output.String())
+	})
+
+	t.Run("show auth", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		show := mock.NewMockShower(ctrl)
+
+		output := strings.Builder{}
+
+		show.EXPECT().Show(
+			gomock.Any(),
+			entity.ShowIn{
+				Type: "auth",
+				Name: "yandex",
+			},
+		).
+			Return(
+				entity.Record{
+					Type: entity.RecordTypeAuth,
+					Name: "yandex",
+					Meta: entity.Meta{
+						"expire:july",
+						"use:never",
+					},
+					Payload: entity.NewAuthPayload("elon", "twitterx"),
+				},
+				nil,
+			)
+
+		c := New(args(
+			t,
+			"show",
+			"auth",
+			"yandex",
+		))
+
+		err := c.Run(ctx,
+			WithShow(show),
+			WithOutput(&output),
+		)
+
+		require.NoError(t, err)
+		assert.Equal(t, `meta:		"expire:july", "use:never"
+login:		elon
+password:	twitterx
 `, output.String())
 	})
 }

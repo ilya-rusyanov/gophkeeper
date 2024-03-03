@@ -35,6 +35,11 @@ type Lister interface {
 	List(context.Context) (entity.DataList, error)
 }
 
+// Shower is usecase for showing stored information
+type Shower interface {
+	Show(context.Context, entity.ShowIn) (entity.Record, error)
+}
+
 // Controller is user controller for interaction with the application
 type Controller struct {
 	cli struct {
@@ -42,6 +47,7 @@ type Controller struct {
 		LogIn    LogInCmd    `cmd:"" help:"Log user in"`
 		Store    StoreCmd    `cmd:"" help:"Store data"`
 		List     ListCmd     `cmd:"" help:"List stored data"`
+		Show     ShowCmd     `cmd:"" help:"Show stored data"`
 		Config   Config      `embed:""`
 	}
 	args []string
@@ -82,6 +88,14 @@ func WithList(l Lister) Opt {
 func WithOutput(o io.Writer) Opt {
 	return func(c *Controller) {
 		c.cli.List.output = o
+		c.cli.Show.output = o
+	}
+}
+
+// WithShow specifies show use case
+func WithShow(s Shower) Opt {
+	return func(c *Controller) {
+		c.cli.Show.uc = s
 	}
 }
 
