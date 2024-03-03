@@ -51,7 +51,10 @@ func main() {
 		myAuthStorage,
 	)
 
-	showUseCase := show.New()
+	showUseCase := show.New(
+		myAuthStorage,
+		gophkeeperGateway,
+	)
 
 	ctrl := controller.New(cmdlineArgs)
 

@@ -39,6 +39,18 @@ message ListResponse {
   repeated Entry Entries = 10;
 }
 
+message ShowRequest {
+  string type = 10;
+  string name = 20;
+}
+
+message ShowResponse {
+  string type = 10;
+  string name = 20;
+  string meta = 30;
+  bytes payload = 40;
+}
+
 message Empty {
 }
 
@@ -47,4 +59,5 @@ service Gophkeeper {
   rpc LogIn(LogInRequest) returns (Empty);
   rpc Store(StoreRequest) returns (Empty);
   rpc List(ListRequest) returns (ListResponse);
+  rpc Show(ShowRequest) returns (ShowResponse);
 }

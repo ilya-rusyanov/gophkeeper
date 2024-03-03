@@ -3,6 +3,7 @@ package gophkeepergw
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -179,6 +180,53 @@ func (gk *GophKeeperGW) List(
 	return res, nil
 }
 
+// Show reveals user's data
+func (gk *GophKeeperGW) Show(
+	ctx context.Context, arg entity.ServiceShowRequest,
+) (entity.Record, error) {
+	var (
+		res entity.Record
+		err error
+	)
+
+	err = gk.withConn(func(conn *grpc.ClientConn) error {
+		var resp *proto.ShowResponse
+
+		c := proto.NewGophkeeperClient(conn)
+
+		md := metadata.Pairs("auth", string(arg.AuthData))
+		authCtx := metadata.NewOutgoingContext(ctx, md)
+
+		resp, err = c.Show(authCtx, &proto.ShowRequest{
+			Type: string(arg.Type),
+			Name: arg.Name,
+		})
+		if err != nil {
+			return fmt.Errorf("server failed to store data: %w", err)
+		}
+
+		res.Type = entity.RecordType(resp.Type)
+		res.Name = resp.Name
+
+		res.Meta, err = fromProtoMeta(resp.Meta)
+		if err != nil {
+			return fmt.Errorf("failed to read meta: %w", err)
+		}
+
+		res.Payload, err = fromProtoPayload(res.Type, resp.Payload)
+		if err != nil {
+			return fmt.Errorf("failed to read proto payload: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return res, fmt.Errorf("remote service error: %w", err)
+	}
+
+	return res, nil
+}
+
 func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
 	conn, err := grpc.Dial(
 		gk.serverAddr,
@@ -219,6 +267,41 @@ func toProtoPayload(in any) ([]byte, error) {
 	res, err := json.Marshal(in)
 	if err != nil {
 		return res, fmt.Errorf("failed to encode payload to json: %w", err)
+	}
+
+	return res, nil
+}
+
+func fromProtoMeta(arg string) (entity.Meta, error) {
+	var res entity.Meta
+
+	err := json.Unmarshal([]byte(arg), &res)
+	if err != nil {
+		return res, fmt.Errorf("failed to unmarshal meta: %w", err)
+	}
+
+	return res, nil
+}
+
+func fromProtoPayload(typ entity.RecordType, in []byte) (any, error) {
+	var res any
+
+	switch typ {
+	case "auth":
+		var val entity.AuthPayload
+
+		err := json.Unmarshal(in, &val)
+		if err != nil {
+			return res, fmt.Errorf("failed to unmarshal auth: %w", err)
+		}
+
+		return val, nil
+	case "card":
+		return res, errors.New("TODO")
+	case "text":
+		return res, errors.New("TODO")
+	case "bin":
+		return res, errors.New("TODO")
 	}
 
 	return res, nil

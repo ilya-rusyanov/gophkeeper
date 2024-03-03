@@ -23,6 +23,7 @@ const (
 	Gophkeeper_LogIn_FullMethodName    = "/gophkeeper.Gophkeeper/LogIn"
 	Gophkeeper_Store_FullMethodName    = "/gophkeeper.Gophkeeper/Store"
 	Gophkeeper_List_FullMethodName     = "/gophkeeper.Gophkeeper/List"
+	Gophkeeper_Show_FullMethodName     = "/gophkeeper.Gophkeeper/Show"
 )
 
 // GophkeeperClient is the client API for Gophkeeper service.
@@ -33,6 +34,7 @@ type GophkeeperClient interface {
 	LogIn(ctx context.Context, in *LogInRequest, opts ...grpc.CallOption) (*Empty, error)
 	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*Empty, error)
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	Show(ctx context.Context, in *ShowRequest, opts ...grpc.CallOption) (*ShowResponse, error)
 }
 
 type gophkeeperClient struct {
@@ -79,6 +81,15 @@ func (c *gophkeeperClient) List(ctx context.Context, in *ListRequest, opts ...gr
 	return out, nil
 }
 
+func (c *gophkeeperClient) Show(ctx context.Context, in *ShowRequest, opts ...grpc.CallOption) (*ShowResponse, error) {
+	out := new(ShowResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_Show_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GophkeeperServer is the server API for Gophkeeper service.
 // All implementations must embed UnimplementedGophkeeperServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type GophkeeperServer interface {
 	LogIn(context.Context, *LogInRequest) (*Empty, error)
 	Store(context.Context, *StoreRequest) (*Empty, error)
 	List(context.Context, *ListRequest) (*ListResponse, error)
+	Show(context.Context, *ShowRequest) (*ShowResponse, error)
 	mustEmbedUnimplementedGophkeeperServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedGophkeeperServer) Store(context.Context, *StoreRequest) (*Emp
 }
 func (UnimplementedGophkeeperServer) List(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedGophkeeperServer) Show(context.Context, *ShowRequest) (*ShowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Show not implemented")
 }
 func (UnimplementedGophkeeperServer) mustEmbedUnimplementedGophkeeperServer() {}
 
@@ -191,6 +206,24 @@ func _Gophkeeper_List_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gophkeeper_Show_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).Show(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_Show_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).Show(ctx, req.(*ShowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gophkeeper_ServiceDesc is the grpc.ServiceDesc for Gophkeeper service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var Gophkeeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _Gophkeeper_List_Handler,
+		},
+		{
+			MethodName: "Show",
+			Handler:    _Gophkeeper_Show_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
