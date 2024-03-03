@@ -9,6 +9,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/auth"
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/list"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/login"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/register"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/store"
@@ -44,6 +45,11 @@ func main() {
 		gophkeeperGateway,
 	)
 
+	listUseCase := list.New(
+		gophkeeperGateway,
+		myAuthStorage,
+	)
+
 	ctrl := controller.New(cmdlineArgs)
 
 	ctx, cancel := signal.NotifyContext(
@@ -59,6 +65,7 @@ func main() {
 		controller.WithRegister(registerUseCase),
 		controller.WithLogIn(logInUseCase),
 		controller.WithStore(storeUseCase),
+		controller.WithList(listUseCase),
 	); err != nil {
 		log.Fatal(err)
 	}

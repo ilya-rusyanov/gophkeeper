@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] load different credentials functionality
+- [ ] show different credentials functionality
 - [ ] store arbitrary text
 - [ ] store binary
 - [ ] store cards
@@ -10,7 +10,7 @@
 - [ ] makefile unix, osx, windows
 - [ ] login functionality
 - [ ] client commandline global flags
-- [ ] prevent user from able to store or load before registering
+- [ ] prevent user from able to store, list, show before registering
 - [ ] force store functionality (overwrite) client (flag) and server (update)
 - [ ] client error printer for user
 - [ ] log format for client should be plain text and not json
@@ -18,11 +18,12 @@
 
 ## In progress
 
-- [ ] client list usecase
+- [ ] client controller print listed data
 - [ ] list data functionality
 
 ## Done
 
+- [X] client list usecase
 - [X] client controller list
 - [X] store different credentials functionality
 - [X] server stores data to database
