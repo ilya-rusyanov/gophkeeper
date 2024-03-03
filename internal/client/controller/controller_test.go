@@ -14,6 +14,7 @@ import (
 //go:generate mockgen -destination ./mock/registerer.go -package mock . Registerer
 //go:generate mockgen -destination ./mock/storer.go -package mock . Storer
 //go:generate mockgen -destination ./mock/loginer.go -package mock . LogIner
+//go:generate mockgen -destination ./mock/lister.go -package mock . Lister
 
 func TestReadConfig(t *testing.T) {
 	t.Run("values", func(t *testing.T) {
@@ -108,6 +109,25 @@ func TestController(t *testing.T) {
 		))
 
 		err := c.Run(ctx, WithStore(stor))
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("listing", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		list := mock.NewMockLister(ctrl)
+
+		list.EXPECT().List(
+			gomock.Any(),
+		)
+
+		c := New(args(t,
+			"list",
+		))
+
+		err := c.Run(ctx, WithList(list))
 
 		assert.NoError(t, err)
 	})

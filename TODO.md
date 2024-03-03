@@ -18,10 +18,12 @@
 
 ## In progress
 
+- [ ] client list usecase
 - [ ] list data functionality
 
 ## Done
 
+- [X] client controller list
 - [X] store different credentials functionality
 - [X] server stores data to database
 - [X] server grpcservice test err record already exists

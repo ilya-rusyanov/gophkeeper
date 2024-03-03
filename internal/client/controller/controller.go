@@ -29,12 +29,18 @@ type LogIner interface {
 	LogIn(context.Context, entity.MyCredentials) error
 }
 
+// Lister is stored data listing use case
+type Lister interface {
+	List(context.Context) error
+}
+
 // Controller is user controller for interaction with the application
 type Controller struct {
 	cli struct {
 		Register RegisterCmd `cmd:"" help:"Register user"`
 		LogIn    LogInCmd    `cmd:"" help:"Log user in"`
 		Store    StoreCmd    `cmd:"" help:"Store data"`
+		List     ListCmd     `cmd:"" help:"List stored data"`
 		Config   Config      `embed:""`
 	}
 	args []string
@@ -57,9 +63,17 @@ func WithStore(s Storer) Opt {
 	}
 }
 
+// WithLogin supplies log in use case
 func WithLogIn(l LogIner) Opt {
 	return func(c *Controller) {
 		c.cli.LogIn.uc = l
+	}
+}
+
+// WitList supplies list use case
+func WithList(l Lister) Opt {
+	return func(c *Controller) {
+		c.cli.List.uc = l
 	}
 }
 
