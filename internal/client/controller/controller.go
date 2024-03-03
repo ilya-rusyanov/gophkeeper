@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/alecthomas/kong"
 
@@ -31,7 +32,7 @@ type LogIner interface {
 
 // Lister is stored data listing use case
 type Lister interface {
-	List(context.Context) error
+	List(context.Context) (entity.DataList, error)
 }
 
 // Controller is user controller for interaction with the application
@@ -74,6 +75,13 @@ func WithLogIn(l LogIner) Opt {
 func WithList(l Lister) Opt {
 	return func(c *Controller) {
 		c.cli.List.uc = l
+	}
+}
+
+// WithOutput supplies controller text output
+func WithOutput(o io.Writer) Opt {
+	return func(c *Controller) {
+		c.cli.List.output = o
 	}
 }
 

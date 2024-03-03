@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	entity "github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,11 +41,12 @@ func (m *MockLister) EXPECT() *MockListerMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockLister) List(arg0 context.Context) error {
+func (m *MockLister) List(arg0 context.Context) (entity.DataList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(entity.DataList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // List indicates an expected call of List.

@@ -18,11 +18,11 @@
 
 ## In progress
 
-- [ ] client controller print listed data
 - [ ] list data functionality
 
 ## Done
 
+- [X] client controller print listed data
 - [X] client list usecase
 - [X] client controller list
 - [X] store different credentials functionality

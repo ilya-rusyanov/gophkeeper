@@ -2,9 +2,11 @@ package controller
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller/mock"
@@ -119,17 +121,31 @@ func TestController(t *testing.T) {
 
 		list := mock.NewMockLister(ctrl)
 
+		output := strings.Builder{}
+
 		list.EXPECT().List(
 			gomock.Any(),
+		).Return(
+			entity.DataList{
+				entity.NewDataListEntry("auth", "yandex"),
+				entity.NewDataListEntry("card", "tinkoff"),
+			},
+			nil,
 		)
 
 		c := New(args(t,
 			"list",
 		))
 
-		err := c.Run(ctx, WithList(list))
+		err := c.Run(ctx,
+			WithList(list),
+			WithOutput(&output),
+		)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
+		assert.Equal(t, `auth	"yandex"
+card	"tinkoff"
+`, output.String())
 	})
 }
 
