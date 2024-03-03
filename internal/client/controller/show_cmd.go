@@ -10,7 +10,7 @@ import (
 
 // ShowCmd is a command for revealing data
 type ShowCmd struct {
-	Type   string `arg:"" help:"Type of data"`
+	Type   string `arg:"" enum:"auth,card,text,bin" help:"Type of data"`
 	Name   string `arg:"" help:"Name of stored data"`
 	uc     Shower
 	output io.Writer
