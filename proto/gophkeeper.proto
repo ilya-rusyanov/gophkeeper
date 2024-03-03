@@ -27,6 +27,18 @@ message StoreRequest {
   bytes payload = 40;
 }
 
+message ListRequest {
+}
+
+message ListResponse {
+  message Entry {
+    string Type = 10;
+    string Name = 20;
+  }
+
+  repeated Entry Entries = 10;
+}
+
 message Empty {
 }
 
@@ -34,4 +46,5 @@ service Gophkeeper {
   rpc Register(RegisterRequest) returns (Empty);
   rpc LogIn(LogInRequest) returns (Empty);
   rpc Store(StoreRequest) returns (Empty);
+  rpc List(ListRequest) returns (ListResponse);
 }

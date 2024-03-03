@@ -145,6 +145,40 @@ func (gk *GophKeeperGW) Store(
 	})
 }
 
+// List lists user's data
+func (gk *GophKeeperGW) List(
+	ctx context.Context, auth entity.MyAuthentication,
+) (entity.DataList, error) {
+	var (
+		res  entity.DataList
+		resp *proto.ListResponse
+		err  error
+	)
+
+	err = gk.withConn(func(conn *grpc.ClientConn) error {
+		c := proto.NewGophkeeperClient(conn)
+
+		md := metadata.Pairs("auth", string(auth))
+		authCtx := metadata.NewOutgoingContext(ctx, md)
+
+		resp, err = c.List(authCtx, &proto.ListRequest{})
+		if err != nil {
+			return fmt.Errorf("server failed to store data: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return res, fmt.Errorf("remote service error: %w", err)
+	}
+
+	for _, e := range resp.Entries {
+		res = append(res, entity.NewDataListEntry(e.Type, e.Name))
+	}
+
+	return res, nil
+}
+
 func (gk *GophKeeperGW) withConn(f func(conn *grpc.ClientConn) error) error {
 	conn, err := grpc.Dial(
 		gk.serverAddr,

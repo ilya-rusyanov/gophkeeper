@@ -18,10 +18,13 @@
 
 ## In progress
 
+- [ ] server controller list impl
 - [ ] list data functionality
 
 ## Done
 
+- [X] client gateway list impl
+- [X] proto list
 - [X] client controller print listed data
 - [X] client list usecase
 - [X] client controller list
