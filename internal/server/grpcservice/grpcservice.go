@@ -34,6 +34,11 @@ type IStoreUC interface {
 	Store(context.Context, *entity.StoreIn) error
 }
 
+// Lister is listing use case
+type Lister interface {
+	List(ctx context.Context, username string) (entity.DataListing, error)
+}
+
 // Service is a gophkeeper gRPC service
 type Service struct {
 	proto.UnimplementedGophkeeperServer
@@ -41,6 +46,7 @@ type Service struct {
 	registrationUC IRegisterUC
 	loginUC        LogIner
 	storeUC        IStoreUC
+	listUC         Lister
 }
 
 // New constructs Service
@@ -49,12 +55,14 @@ func New(
 	reg IRegisterUC,
 	login LogIner,
 	store IStoreUC,
+	list Lister,
 ) *Service {
 	return &Service{
 		log:            log,
 		registrationUC: reg,
 		loginUC:        login,
 		storeUC:        store,
+		listUC:         list,
 	}
 }
 
@@ -159,6 +167,44 @@ func (s *Service) Store(
 		return nil, status.Error(
 			codes.Internal,
 			fmt.Sprintf("internal error: %s", err.Error()))
+	}
+
+	return &res, nil
+}
+
+// List performs listing of user's data
+func (s *Service) List(
+	ctx context.Context, request *proto.ListRequest,
+) (*proto.ListResponse, error) {
+	var res proto.ListResponse
+
+	login := ctx.Value(grpcctx.ContextKeyLogin).(string)
+
+	l, err := s.listUC.List(
+		ctx,
+		login,
+	)
+	switch {
+	case errors.Is(err, entity.ErrAuthFailed):
+		return nil, status.Error(
+			codes.Unauthenticated,
+			fmt.Sprintf("auth failed: %s", err.Error()))
+	case errors.Is(err, entity.ErrNoSuchUser):
+		return nil, status.Error(
+			codes.AlreadyExists,
+			"user with given login does not exist")
+	case err != nil:
+		return nil, status.Error(
+			codes.Internal,
+			fmt.Sprintf("internal error: %s", err.Error()))
+	}
+
+	for _, e := range l {
+		res.Entries = append(res.Entries,
+			&proto.ListResponse_Entry{
+				Type: e.Type,
+				Name: e.Name,
+			})
 	}
 
 	return &res, nil
