@@ -77,6 +77,7 @@ func main() {
 		registerUC,
 		logInUC,
 		storeUC,
+		dataRepo,
 	)
 
 	grpcServer, err := grpcserver.New(

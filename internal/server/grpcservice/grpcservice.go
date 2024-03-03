@@ -155,10 +155,6 @@ func (s *Service) Store(
 		),
 	)
 	switch {
-	case errors.Is(err, entity.ErrAuthFailed):
-		return nil, status.Error(
-			codes.Unauthenticated,
-			fmt.Sprintf("auth failed: %s", err.Error()))
 	case errors.Is(err, entity.ErrRecordAlreadyExists):
 		return nil, status.Error(
 			codes.AlreadyExists,
@@ -185,14 +181,6 @@ func (s *Service) List(
 		login,
 	)
 	switch {
-	case errors.Is(err, entity.ErrAuthFailed):
-		return nil, status.Error(
-			codes.Unauthenticated,
-			fmt.Sprintf("auth failed: %s", err.Error()))
-	case errors.Is(err, entity.ErrNoSuchUser):
-		return nil, status.Error(
-			codes.AlreadyExists,
-			"user with given login does not exist")
 	case err != nil:
 		return nil, status.Error(
 			codes.Internal,

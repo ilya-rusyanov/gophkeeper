@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] show different credentials functionality
 - [ ] store arbitrary text
 - [ ] store binary
 - [ ] store cards
@@ -18,11 +17,13 @@
 
 ## In progress
 
-- [ ] server controller list impl
-- [ ] list data functionality
+- [ ] show different credentials functionality
 
 ## Done
 
+- [X] server storage list impl
+- [X] list data functionality
+- [X] server controller list impl
 - [X] client gateway list impl
 - [X] proto list
 - [X] client controller print listed data

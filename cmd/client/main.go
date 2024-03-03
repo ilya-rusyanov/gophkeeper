@@ -66,6 +66,7 @@ func main() {
 		controller.WithLogIn(logInUseCase),
 		controller.WithStore(storeUseCase),
 		controller.WithList(listUseCase),
+		controller.WithOutput(os.Stdout),
 	); err != nil {
 		log.Fatal(err)
 	}

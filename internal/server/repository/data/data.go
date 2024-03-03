@@ -49,3 +49,37 @@ VALUES($1, $2, $3, $4, $5)`,
 
 	return nil
 }
+
+// List gives listing of user's data
+func (r *Repository) List(
+	ctx context.Context, user string,
+) (entity.DataListing, error) {
+	var res entity.DataListing
+
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT type, name FROM data WHERE login = $1`, user,
+	)
+	if err != nil {
+		return res, fmt.Errorf("failed to select data: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var entry entity.DataListEntry
+		err = rows.Scan(&entry.Type, &entry.Name)
+		if err != nil {
+			return res, fmt.Errorf("failed to scan row: %w", err)
+		}
+
+		res = append(res, entry)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return res, fmt.Errorf(
+			"failed to finalize data list entries: %w", err)
+	}
+
+	return res, nil
+}
