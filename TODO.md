@@ -17,10 +17,12 @@
 
 ## In progress
 
+- [ ] server show usecase impl
 - [ ] show different credentials functionality
 
 ## Done
 
+- [X] server controller show impl
 - [X] client show gw impl
 - [X] client show use case
 - [X] client controller show impl

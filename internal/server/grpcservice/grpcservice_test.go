@@ -17,10 +17,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/proto"
 )
 
-//go:generate mockgen -destination ./mock/iregisteruc.go -package mock . IRegisterUC
-//go:generate mockgen -destination ./mock/loginer.go -package mock . LogIner
-//go:generate mockgen -destination ./mock/istoreuc.go -package mock . IStoreUC
-//go:generate mockgen -destination ./mock/lister.go -package mock . Lister
+//go:generate mockgen -destination ./mock/mocks.go -package mock . IRegisterUC,LogIner,IStoreUC,Lister,Shower
 
 type dummyLogger struct{}
 
@@ -42,7 +39,7 @@ func TestRegister(t *testing.T) {
 			*entity.NewUserCredentials("john", "strongpw"),
 		)
 
-		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil)
+		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil, nil)
 
 		_, err := grpcsvc.Register(ctx,
 			&proto.RegisterRequest{
@@ -64,7 +61,7 @@ func TestRegister(t *testing.T) {
 		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
 			Return(entity.AuthToken(""), entity.ErrUserAlreadyExists)
 
-		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil)
+		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil, nil)
 
 		_, err := grpcsvc.Register(
 			ctx,
@@ -84,7 +81,7 @@ func TestRegister(t *testing.T) {
 		uc.EXPECT().Register(gomock.Any(), gomock.Any()).
 			Return(entity.AuthToken(""), errors.New("a different error"))
 
-		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil)
+		grpcsvc := New(&dummyLogger{}, uc, nil, nil, nil, nil)
 
 		_, err := grpcsvc.Register(ctx,
 			&proto.RegisterRequest{
@@ -107,7 +104,7 @@ func TestLogIn(t *testing.T) {
 		uc.EXPECT().
 			LogIn(gomock.Any(), *entity.NewUserCredentials("john", "strongpw"))
 
-		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil)
+		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil, nil)
 
 		_, err := grpcsvc.LogIn(ctx,
 			&proto.LogInRequest{
@@ -131,7 +128,7 @@ func TestLogIn(t *testing.T) {
 			LogIn(gomock.Any(), *entity.NewUserCredentials("john", "strongpw")).
 			Return(entity.AuthToken(""), entity.ErrNoSuchUser)
 
-		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil)
+		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil, nil)
 
 		_, err := grpcsvc.LogIn(ctx,
 			&proto.LogInRequest{
@@ -155,7 +152,7 @@ func TestLogIn(t *testing.T) {
 			LogIn(gomock.Any(), *entity.NewUserCredentials("john", "strongpw")).
 			Return(entity.AuthToken(""), entity.ErrWrongPassword)
 
-		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil)
+		grpcsvc := New(&dummyLogger{}, nil, uc, nil, nil, nil)
 
 		_, err := grpcsvc.LogIn(ctx,
 			&proto.LogInRequest{
@@ -190,7 +187,7 @@ func TestStore(t *testing.T) {
 			),
 		)
 
-		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil)
+		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil, nil)
 
 		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
 
@@ -217,7 +214,7 @@ func TestStore(t *testing.T) {
 			gomock.Any(),
 		).Return(entity.ErrRecordAlreadyExists)
 
-		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil)
+		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil, nil)
 
 		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
 
@@ -237,7 +234,7 @@ func TestStore(t *testing.T) {
 			gomock.Any(),
 		).Return(errors.New("some other error"))
 
-		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil)
+		grpcsvc := New(&dummyLogger{}, nil, nil, uc, nil, nil)
 
 		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
 
@@ -264,7 +261,7 @@ func TestList(t *testing.T) {
 				},
 				nil)
 
-		grpcsvc := New(&dummyLogger{}, nil, nil, nil, uc)
+		grpcsvc := New(&dummyLogger{}, nil, nil, nil, uc, nil)
 
 		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
 
@@ -276,5 +273,54 @@ func TestList(t *testing.T) {
 		assert.Equal(t, "yandex", l.Entries[0].Name)
 		assert.Equal(t, "card", l.Entries[1].Type)
 		assert.Equal(t, "tinkoff", l.Entries[1].Name)
+	})
+}
+
+func TestShow(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("auth show", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mock.NewMockShower(ctrl)
+
+		uc.EXPECT().Show(gomock.Any(),
+			entity.ShowIn{
+				Login: "john",
+				Type:  "auth",
+				Name:  "yandex",
+			}).
+			Return(
+				entity.ShowResult{
+					Type: "auth",
+					Name: "yandex",
+					Meta: `["expires:july"]`,
+					Payload: []byte(
+						`{"login":"elon","password:twitterx"}`,
+					),
+				},
+				nil)
+
+		grpcsvc := New(&dummyLogger{}, nil, nil, nil, nil, uc)
+
+		ctxVal := context.WithValue(ctx, grpcctx.ContextKeyLogin, "john")
+
+		s, err := grpcsvc.Show(ctxVal, &proto.ShowRequest{
+			Type: "auth",
+			Name: "yandex",
+		})
+
+		require.NoError(t, err)
+		require.Equal(t,
+			&proto.ShowResponse{
+				Type: "auth",
+				Name: "yandex",
+				Meta: `["expires:july"]`,
+				Payload: []byte(
+					`{"login":"elon","password:twitterx"}`,
+				),
+			},
+			s)
 	})
 }

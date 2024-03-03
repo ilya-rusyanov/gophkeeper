@@ -39,6 +39,11 @@ type Lister interface {
 	List(ctx context.Context, username string) (entity.DataListing, error)
 }
 
+// Shower reveals user's stored data
+type Shower interface {
+	Show(context.Context, entity.ShowIn) (entity.ShowResult, error)
+}
+
 // Service is a gophkeeper gRPC service
 type Service struct {
 	proto.UnimplementedGophkeeperServer
@@ -47,6 +52,7 @@ type Service struct {
 	loginUC        LogIner
 	storeUC        IStoreUC
 	listUC         Lister
+	showUC         Shower
 }
 
 // New constructs Service
@@ -56,6 +62,7 @@ func New(
 	login LogIner,
 	store IStoreUC,
 	list Lister,
+	show Shower,
 ) *Service {
 	return &Service{
 		log:            log,
@@ -63,6 +70,7 @@ func New(
 		loginUC:        login,
 		storeUC:        store,
 		listUC:         list,
+		showUC:         show,
 	}
 }
 
@@ -180,8 +188,7 @@ func (s *Service) List(
 		ctx,
 		login,
 	)
-	switch {
-	case err != nil:
+	if err != nil {
 		return nil, status.Error(
 			codes.Internal,
 			fmt.Sprintf("internal error: %s", err.Error()))
@@ -194,6 +201,36 @@ func (s *Service) List(
 				Name: e.Name,
 			})
 	}
+
+	return &res, nil
+}
+
+// Show reveals user's data
+func (s *Service) Show(
+	ctx context.Context, request *proto.ShowRequest,
+) (*proto.ShowResponse, error) {
+	var res proto.ShowResponse
+
+	login := ctx.Value(grpcctx.ContextKeyLogin).(string)
+
+	sh, err := s.showUC.Show(
+		ctx,
+		entity.ShowIn{
+			Login: login,
+			Type:  request.Type,
+			Name:  request.Name,
+		},
+	)
+	if err != nil {
+		return nil, status.Error(
+			codes.Internal,
+			fmt.Sprintf("internal error: %s", err.Error()))
+	}
+
+	res.Type = sh.Type
+	res.Name = sh.Name
+	res.Meta = sh.Meta
+	res.Payload = sh.Payload
 
 	return &res, nil
 }
