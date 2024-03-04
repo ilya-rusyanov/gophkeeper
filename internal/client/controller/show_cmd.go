@@ -42,6 +42,11 @@ func (c *ShowCmd) Run(arg *Arg) error {
 		buf.WriteString(`
 login:		` + v.Login + `
 password:	` + v.Password + "\n")
+	case entity.TextPayload:
+		buf.WriteString(`
+text:		`)
+		buf.WriteString(string(v))
+		buf.WriteString("\n")
 	default:
 		return fmt.Errorf("unknown data type")
 	}

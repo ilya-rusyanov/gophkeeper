@@ -83,3 +83,24 @@ func (r *Repository) List(
 
 	return res, nil
 }
+
+// Show reveals user's data entry
+func (r *Repository) Show(
+	ctx context.Context, arg entity.ShowIn,
+) (entity.ShowResult, error) {
+	var res entity.ShowResult
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT type, name, meta, data FROM data WHERE login = $1
+		AND type = $2 AND name = $3`, arg.Login, arg.Type, arg.Name,
+	).Scan(&res.Type, &res.Name, &res.Meta, &res.Payload)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return res, entity.ErrRecordNotFound
+	case err != nil:
+		return res, fmt.Errorf("unexpected database error: %w", err)
+	}
+
+	return res, nil
+}

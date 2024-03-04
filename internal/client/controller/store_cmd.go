@@ -2,7 +2,8 @@ package controller
 
 // StoreCmd is subcommand for data storage
 type StoreCmd struct {
-	Auth StoreAuthCmd `cmd:"" help:"Store arbitrary credentials"`
+	Auth StoreAuthCmd `cmd:"" help:"Store credentials"`
+	Text StoreTextCmd `cmd:"" help:"Store arbitrary text"`
 }
 
 // Run executes the command

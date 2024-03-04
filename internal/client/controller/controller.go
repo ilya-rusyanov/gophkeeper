@@ -67,6 +67,7 @@ func WithRegister(r Registerer) Opt {
 func WithStore(s Storer) Opt {
 	return func(c *Controller) {
 		c.cli.Store.Auth.uc = s
+		c.cli.Store.Text.uc = s
 	}
 }
 

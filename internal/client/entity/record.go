@@ -27,3 +27,17 @@ func NewAuthRecord(
 		Payload: &data,
 	}
 }
+
+// NewTextRecord constructs text data record
+func NewTextRecord(
+	name string,
+	meta Meta,
+	data TextPayload,
+) *Record {
+	return &Record{
+		Type:    RecordTypeText,
+		Name:    name,
+		Meta:    meta,
+		Payload: &data,
+	}
+}

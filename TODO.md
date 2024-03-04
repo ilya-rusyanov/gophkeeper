@@ -1,7 +1,5 @@
 # TODO
 
-- [ ] store arbitrary text
-- [ ] store binary
 - [ ] store cards
 - [ ] server data encryption (master password)
 - [ ] client do not allow to perform anything other then registration or login without token
@@ -17,11 +15,17 @@
 
 ## In progress
 
-- [ ] server show usecase impl
-- [ ] show different credentials functionality
+- [ ] client controller store binary impl
+- [ ] store binary
 
 ## Done
 
+- [X] controller text show gw impl
+- [X] store arbitrary text
+- [X] client controller text show impl
+- [X] client controller text store impl
+- [X] show different credentials functionality
+- [X] server show usecase impl
 - [X] server controller show impl
 - [X] client show gw impl
 - [X] client show use case

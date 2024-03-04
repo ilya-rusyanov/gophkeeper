@@ -6,4 +6,6 @@ type RecordType string
 const (
 	// RecordTypeAuth is authentication data
 	RecordTypeAuth RecordType = "auth"
+	// RecordTypeText is text data
+	RecordTypeText RecordType = "text"
 )

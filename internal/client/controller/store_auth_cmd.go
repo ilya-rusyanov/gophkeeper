@@ -15,6 +15,7 @@ type StoreAuthCmd struct {
 	uc       Storer      `kong:"-"`
 }
 
+// Run executes the command
 func (s *StoreAuthCmd) Run(arg *Arg) error {
 	err := s.uc.Store(
 		arg.Context,

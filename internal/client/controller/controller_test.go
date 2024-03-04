@@ -112,6 +112,36 @@ func TestController(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("store text", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		stor := mock.NewMockStorer(ctrl)
+
+		stor.EXPECT().Store(
+			gomock.Any(),
+			*entity.NewTextRecord(
+				"fish",
+				entity.Meta{
+					"topic:lost",
+				},
+				entity.NewTextPayload("Lorem ipsum dolor sit amet"),
+			),
+		)
+
+		c := New(args(t,
+			"store",
+			"text",
+			"fish",
+			"--meta", "topic:lost",
+			"Lorem ipsum dolor sit amet",
+		))
+
+		err := c.Run(ctx, WithStore(stor))
+
+		assert.NoError(t, err)
+	})
+
 	t.Run("listing", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -189,6 +219,51 @@ card	"tinkoff"
 		assert.Equal(t, `meta:		"expire:july", "use:never"
 login:		elon
 password:	twitterx
+`, output.String())
+	})
+
+	t.Run("show text", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		show := mock.NewMockShower(ctrl)
+
+		output := strings.Builder{}
+
+		show.EXPECT().Show(
+			gomock.Any(),
+			entity.ShowIn{
+				Type: "text",
+				Name: "fish",
+			},
+		).
+			Return(
+				entity.Record{
+					Type: entity.RecordTypeText,
+					Name: "fish",
+					Meta: entity.Meta{
+						"meaning:no",
+					},
+					Payload: entity.NewTextPayload("Lorem ipsum dolor sit amet"),
+				},
+				nil,
+			)
+
+		c := New(args(
+			t,
+			"show",
+			"text",
+			"fish",
+		))
+
+		err := c.Run(ctx,
+			WithShow(show),
+			WithOutput(&output),
+		)
+
+		require.NoError(t, err)
+		assert.Equal(t, `meta:		"meaning:no"
+text:		Lorem ipsum dolor sit amet
 `, output.String())
 	})
 }

@@ -202,7 +202,7 @@ func (gk *GophKeeperGW) Show(
 			Name: arg.Name,
 		})
 		if err != nil {
-			return fmt.Errorf("server failed to store data: %w", err)
+			return fmt.Errorf("server failed to show data: %w", err)
 		}
 
 		res.Type = entity.RecordType(resp.Type)
@@ -299,10 +299,16 @@ func fromProtoPayload(typ entity.RecordType, in []byte) (any, error) {
 	case "card":
 		return res, errors.New("TODO")
 	case "text":
-		return res, errors.New("TODO")
+		var val entity.TextPayload
+		err := json.Unmarshal(in, &val)
+		if err != nil {
+			return res, fmt.Errorf("failed to unmarshal text payload: %w", err)
+		}
+
+		return val, nil
 	case "bin":
 		return res, errors.New("TODO")
 	}
 
-	return res, nil
+	return res, errors.New("unknown payload type")
 }

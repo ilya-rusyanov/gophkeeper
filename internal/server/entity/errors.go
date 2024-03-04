@@ -13,4 +13,6 @@ var (
 	ErrWrongPassword = errors.New("wrong password")
 	// ErrRecordAlreadyExists when such data record is already present
 	ErrRecordAlreadyExists = errors.New("record already exists")
+	// ErrRecordNotFound is raised when there is no such data record
+	ErrRecordNotFound = errors.New("record not found")
 )
