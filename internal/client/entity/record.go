@@ -41,3 +41,17 @@ func NewTextRecord(
 		Payload: &data,
 	}
 }
+
+// NewTextRecord constructs text data record
+func NewBinRecord(
+	name string,
+	meta Meta,
+	data BinPayload,
+) *Record {
+	return &Record{
+		Type:    RecordTypeText,
+		Name:    name,
+		Meta:    meta,
+		Payload: &data,
+	}
+}

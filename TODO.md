@@ -15,11 +15,12 @@
 
 ## In progress
 
-- [ ] client controller store binary impl
+- [ ] client use case store binary impl
 - [ ] store binary
 
 ## Done
 
+- [X] client controller store binary impl
 - [X] controller text show gw impl
 - [X] store arbitrary text
 - [X] client controller text show impl

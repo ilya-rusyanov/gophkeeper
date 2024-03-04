@@ -25,6 +25,11 @@ type Storer interface {
 	Store(context.Context, entity.Record) error
 }
 
+// BinStorer allows to store binary data
+type BinStorer interface {
+	StoreBin(ctx context.Context, rec entity.Record, filePath string) error
+}
+
 // LogIner is domain logic of loging user in
 type LogIner interface {
 	LogIn(context.Context, entity.MyCredentials) error
@@ -68,6 +73,13 @@ func WithStore(s Storer) Opt {
 	return func(c *Controller) {
 		c.cli.Store.Auth.uc = s
 		c.cli.Store.Text.uc = s
+	}
+}
+
+// WithBinStore specifies binary Store use case
+func WithBinStore(s BinStorer) Opt {
+	return func(c *Controller) {
+		c.cli.Store.Bin.uc = s
 	}
 }
 

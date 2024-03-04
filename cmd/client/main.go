@@ -71,6 +71,7 @@ func main() {
 		controller.WithRegister(registerUseCase),
 		controller.WithLogIn(logInUseCase),
 		controller.WithStore(storeUseCase),
+		controller.WithBinStore(binStoreUseCase),
 		controller.WithList(listUseCase),
 		controller.WithOutput(os.Stdout),
 		controller.WithShow(showUseCase),

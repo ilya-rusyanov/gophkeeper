@@ -13,7 +13,7 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
-//go:generate mockgen -destination ./mock/mocks.go -package mock . Registerer,Storer,LogIner,Lister,Shower
+//go:generate mockgen -destination ./mock/mocks.go -package mock . Registerer,Storer,BinStorer,LogIner,Lister,Shower
 
 func TestReadConfig(t *testing.T) {
 	t.Run("values", func(t *testing.T) {
@@ -138,6 +138,37 @@ func TestController(t *testing.T) {
 		))
 
 		err := c.Run(ctx, WithStore(stor))
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("store bin", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		stor := mock.NewMockBinStorer(ctrl)
+
+		stor.EXPECT().StoreBin(
+			gomock.Any(),
+			*entity.NewBinRecord(
+				"img",
+				entity.Meta{
+					"theme:sea",
+				},
+				[]byte{},
+			),
+			"/tmp/view.jpeg",
+		)
+
+		c := New(args(t,
+			"store",
+			"bin",
+			"img",
+			"--meta", "theme:sea",
+			"/tmp/view.jpeg",
+		))
+
+		err := c.Run(ctx, WithBinStore(stor))
 
 		assert.NoError(t, err)
 	})
