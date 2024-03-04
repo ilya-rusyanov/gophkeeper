@@ -2,30 +2,38 @@ package store
 
 import (
 	"context"
+	"encoding/hex"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/store/mock"
 )
 
-//go:generate mockgen -destination ./mock/mocks.go -package mock . AuthStorager,Servicer,FileReader
-
-func TestStore(t *testing.T) {
+func TestStoreBin(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("store auth", func(t *testing.T) {
+	t.Run("successfull store", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		authRepo := mock.NewMockAuthStorager(ctrl)
 		service := mock.NewMockServicer(ctrl)
+		fileRead := mock.NewMockFileReader(ctrl)
 
 		authRepo.EXPECT().
 			Load().
 			Return(entity.NewMyAuthentication("auth"), nil)
+
+		bin, err := hex.DecodeString("ffd8ffe000104a46")
+		require.NoError(t, err)
+
+		fileRead.EXPECT().
+			ReadFile(gomock.Any(), "/tmp/view.jpeg").
+			Return(bin, nil)
 
 		service.EXPECT().
 			Store(gomock.Any(),
@@ -33,22 +41,23 @@ func TestStore(t *testing.T) {
 					entity.NewMyAuthentication(
 						"auth",
 					),
-					*entity.NewAuthRecord(
-						"yandex mail",
-						entity.Meta{"expires:july"},
-						entity.NewAuthPayload("john", "strongpw"),
+					*entity.NewBinRecord(
+						"img",
+						entity.Meta{"theme:sea"},
+						entity.BinPayload(bin),
 					),
 				),
 			)
 
-		uc := New(authRepo, service)
+		uc := NewBin(authRepo, fileRead, service)
 
-		err := uc.Store(ctx,
-			*entity.NewAuthRecord(
-				"yandex mail",
-				entity.Meta{"expires:july"},
-				entity.NewAuthPayload("john", "strongpw"),
+		err = uc.StoreBin(ctx,
+			*entity.NewBinRecord(
+				"img",
+				entity.Meta{"theme:sea"},
+				[]byte{},
 			),
+			"/tmp/view.jpeg",
 		)
 
 		assert.NoError(t, err)

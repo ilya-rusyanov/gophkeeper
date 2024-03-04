@@ -29,6 +29,8 @@ func main() {
 		log,
 	)
 
+	fileRead := fileread.New()
+
 	myAuthStorage := auth.New("auth.token")
 
 	registerUseCase := register.New(
@@ -43,6 +45,12 @@ func main() {
 
 	storeUseCase := store.New(
 		myAuthStorage,
+		gophkeeperGateway,
+	)
+
+	binStoreUseCase := store.NewBin(
+		myAuthStorage,
+		fileRead,
 		gophkeeperGateway,
 	)
 

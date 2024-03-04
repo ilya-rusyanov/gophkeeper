@@ -7,16 +7,6 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
 )
 
-// AuthStorager is storage of user's own credentials
-type AuthStorager interface {
-	Load() (entity.MyAuthentication, error)
-}
-
-// Servicer is gophkeeper service gateway
-type Servicer interface {
-	Store(context.Context, entity.ServiceStoreRequest) error
-}
-
 // UC is data storing use case
 type UC struct {
 	authStorage AuthStorager
