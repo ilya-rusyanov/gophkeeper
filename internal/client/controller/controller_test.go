@@ -297,6 +297,37 @@ password:	twitterx
 text:		Lorem ipsum dolor sit amet
 `, output.String())
 	})
+
+	t.Run("show binary", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		show := mock.NewMockShower(ctrl)
+
+		show.EXPECT().
+			ShowBin(
+				gomock.Any(),
+				entity.ShowBinIn{
+					Name:   "img",
+					SaveTo: "/tmp/view.jpeg",
+				},
+			).
+			Return(nil)
+
+		c := New(args(
+			t,
+			"show",
+			"bin",
+			"img",
+			"--save-to", "/tmp/view.jpeg",
+		))
+
+		err := c.Run(ctx,
+			WithShow(show),
+		)
+
+		require.NoError(t, err)
+	})
 }
 
 func args(t testing.TB, a ...string) []string {

@@ -240,3 +240,17 @@ func (mr *MockShowerMockRecorder) Show(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Show", reflect.TypeOf((*MockShower)(nil).Show), arg0, arg1)
 }
+
+// ShowBin mocks base method.
+func (m *MockShower) ShowBin(arg0 context.Context, arg1 entity.ShowBinIn) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShowBin", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ShowBin indicates an expected call of ShowBin.
+func (mr *MockShowerMockRecorder) ShowBin(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowBin", reflect.TypeOf((*MockShower)(nil).ShowBin), arg0, arg1)
+}

@@ -43,6 +43,7 @@ type Lister interface {
 // Shower is usecase for showing stored information
 type Shower interface {
 	Show(context.Context, entity.ShowIn) (entity.Record, error)
+	ShowBin(context.Context, entity.ShowBinIn) error
 }
 
 // Controller is user controller for interaction with the application

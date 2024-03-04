@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/fileread"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/auth"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/list"
