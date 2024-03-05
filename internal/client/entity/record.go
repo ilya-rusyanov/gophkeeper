@@ -49,7 +49,7 @@ func NewBinRecord(
 	data BinPayload,
 ) *Record {
 	return &Record{
-		Type:    RecordTypeText,
+		Type:    RecordTypeBin,
 		Name:    name,
 		Meta:    meta,
 		Payload: &data,

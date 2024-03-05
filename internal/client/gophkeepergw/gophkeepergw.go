@@ -125,7 +125,7 @@ func (gk *GophKeeperGW) Store(
 			return fmt.Errorf("failed to convert meta info to proto: %w", err)
 		}
 
-		protoPayload, err := toProtoPayload(in.Record.Payload)
+		protoPayload, err := toProtoPayload(in.Record.Type, in.Record.Payload)
 		if err != nil {
 			return fmt.Errorf("failed to convert payload to proto: %w", err)
 		}
@@ -263,7 +263,16 @@ func toProtoMeta(in entity.Meta) (string, error) {
 	return sb.String(), nil
 }
 
-func toProtoPayload(in any) ([]byte, error) {
+func toProtoPayload(typ entity.RecordType, in any) ([]byte, error) {
+	if typ == entity.RecordTypeBin {
+		b, ok := in.(*entity.BinPayload)
+		if !ok {
+			return nil, fmt.Errorf("inconsitent type and payload")
+		}
+
+		return []byte(*b), nil
+	}
+
 	res, err := json.Marshal(in)
 	if err != nil {
 		return res, fmt.Errorf("failed to encode payload to json: %w", err)
@@ -307,7 +316,9 @@ func fromProtoPayload(typ entity.RecordType, in []byte) (any, error) {
 
 		return val, nil
 	case "bin":
-		return res, errors.New("TODO")
+		val := entity.BinPayload(in)
+
+		return &val, nil
 	}
 
 	return res, errors.New("unknown payload type")

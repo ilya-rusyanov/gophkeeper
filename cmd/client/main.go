@@ -8,6 +8,7 @@ import (
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/controller"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/fileread"
+	"github.com/ilya-rusyanov/gophkeeper/internal/client/filesave"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/gophkeepergw"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/storage/auth"
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/list"
@@ -31,6 +32,8 @@ func main() {
 	)
 
 	fileRead := fileread.New()
+
+	fileSave := filesave.New()
 
 	myAuthStorage := auth.New("auth.token")
 
@@ -63,6 +66,7 @@ func main() {
 	showUseCase := show.New(
 		myAuthStorage,
 		gophkeeperGateway,
+		fileSave,
 	)
 
 	ctrl := controller.New(cmdlineArgs)

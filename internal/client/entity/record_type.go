@@ -8,4 +8,6 @@ const (
 	RecordTypeAuth RecordType = "auth"
 	// RecordTypeText is text data
 	RecordTypeText RecordType = "text"
+	// RecordTypeBin is binary data
+	RecordTypeBin RecordType = "bin"
 )

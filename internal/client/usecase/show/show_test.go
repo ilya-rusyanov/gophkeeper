@@ -2,6 +2,7 @@ package show
 
 import (
 	"context"
+	"encoding/hex"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,12 +13,12 @@ import (
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/usecase/show/mock"
 )
 
-//go:generate mockgen -destination ./mock/mocks.go -package mock . Servicer,Storager
+//go:generate mockgen -destination ./mock/mocks.go -package mock . Servicer,Storager,FileSaver
 
 func TestShow(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("successfull show", func(t *testing.T) {
+	t.Run("ordinary show", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -41,7 +42,7 @@ func TestShow(t *testing.T) {
 				entity.NewAuthPayload("elon", "twitterx"),
 			), nil)
 
-		uc := New(storager, servicer)
+		uc := New(storager, servicer, nil)
 
 		s, err := uc.Show(ctx, entity.ShowIn{
 			Type: "auth",
@@ -54,5 +55,50 @@ func TestShow(t *testing.T) {
 			entity.Meta{"expires:july"},
 			entity.NewAuthPayload("elon", "twitterx"),
 		), s)
+	})
+
+	t.Run("binary show", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		storager := mock.NewMockStorager(ctrl)
+		servicer := mock.NewMockServicer(ctrl)
+		fileSaver := mock.NewMockFileSaver(ctrl)
+
+		storager.EXPECT().
+			Load().
+			Return(entity.NewMyAuthentication("my auth"), nil)
+
+		bin, err := hex.DecodeString("ffd8ffe000104a46")
+		require.NoError(t, err)
+
+		binPayload := entity.BinPayload(bin)
+
+		servicer.EXPECT().
+			Show(gomock.Any(),
+				entity.ServiceShowRequest{
+					AuthData: entity.NewMyAuthentication("my auth"),
+					Type:     entity.RecordTypeBin,
+					Name:     "img",
+				}).Return(
+			*entity.NewBinRecord(
+				"img",
+				entity.Meta{"theme:sea"},
+				binPayload,
+			), nil)
+
+		fileSaver.EXPECT().
+			SaveFile(gomock.Any(), entity.FileSaveIn{
+				Data:     &binPayload,
+				FilePath: "/tmp/image.jpeg",
+			})
+
+		uc := New(storager, servicer, fileSaver)
+
+		err = uc.ShowBin(ctx, entity.ShowBinIn{
+			Name:   "img",
+			SaveTo: "/tmp/image.jpeg",
+		})
+		require.NoError(t, err)
 	})
 }

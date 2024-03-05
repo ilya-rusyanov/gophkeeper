@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] store cards
 - [ ] server data encryption (master password)
 - [ ] client do not allow to perform anything other then registration or login without token
 - [ ] grpc encryption
@@ -15,11 +14,13 @@
 
 ## In progress
 
-- [ ] client usecase show binary
-- [ ] show binary
+- [ ] store cards
+- [ ] show cards
 
 ## Done
 
+- [X] show binary
+- [X] client usecase show binary
 - [X] client controller show binary
 - [X] store binary
 - [X] client file reader
