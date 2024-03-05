@@ -4,8 +4,6 @@
 - [ ] client do not allow to perform anything other then registration or login without token
 - [ ] grpc encryption
 - [ ] makefile unix, osx, windows
-- [ ] login functionality
-- [ ] client commandline global flags
 - [ ] prevent user from able to store, list, show before registering
 - [ ] force store functionality (overwrite) client (flag) and server (update)
 - [ ] client error printer for user
@@ -14,10 +12,9 @@
 
 ## In progress
 
-- [ ] show cards
-
 ## Done
 
+- [X] show cards
 - [X] store cards
 - [X] client controller store card
 - [X] show binary

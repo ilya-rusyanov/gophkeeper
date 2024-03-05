@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/ilya-rusyanov/gophkeeper/internal/client/entity"
@@ -45,19 +46,23 @@ func (c *ShowCmd) Run(arg *Arg) error {
 			buf.WriteString(", ")
 		}
 	}
+	buf.WriteRune('\n')
 
 	switch v := s.Payload.(type) {
 	case entity.AuthPayload:
-		buf.WriteString(`
-login:		` + v.Login + `
+		buf.WriteString(`login:		` + v.Login + `
 password:	` + v.Password + "\n")
 	case entity.TextPayload:
-		buf.WriteString(`
-text:		`)
+		buf.WriteString(`text:		`)
 		buf.WriteString(string(v))
 		buf.WriteString("\n")
+	case entity.CardPayload:
+		buf.WriteString("number:\t\t" + v.Number + "\n")
+		buf.WriteString("expires:\t" + strconv.Itoa(v.ExpMonth) + "/" + strconv.Itoa(v.ExpYear) + "\n")
+		buf.WriteString("holder:\t\t" + v.HolderName + "\n")
+		buf.WriteString("cvc:\t\t" + strconv.Itoa(v.CVC) + "\n")
 	default:
-		return fmt.Errorf("unknown data type")
+		return fmt.Errorf("unknown data type to show")
 	}
 
 	fmt.Fprint(c.output, buf.String())

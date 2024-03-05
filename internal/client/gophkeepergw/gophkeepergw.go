@@ -306,7 +306,14 @@ func fromProtoPayload(typ entity.RecordType, in []byte) (any, error) {
 
 		return val, nil
 	case "card":
-		return res, errors.New("TODO")
+		var val entity.CardPayload
+
+		err := json.Unmarshal(in, &val)
+		if err != nil {
+			return res, fmt.Errorf("failed to unmarshsal card data: %w", err)
+		}
+
+		return val, nil
 	case "text":
 		var val entity.TextPayload
 		err := json.Unmarshal(in, &val)

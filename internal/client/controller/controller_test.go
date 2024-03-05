@@ -365,6 +365,59 @@ text:		Lorem ipsum dolor sit amet
 
 		require.NoError(t, err)
 	})
+
+	t.Run("show card", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		show := mock.NewMockShower(ctrl)
+
+		output := strings.Builder{}
+
+		show.EXPECT().Show(
+			gomock.Any(),
+			entity.ShowIn{
+				Type: "card",
+				Name: "tinkoff",
+			},
+		).
+			Return(
+				entity.Record{
+					Type: entity.RecordTypeCard,
+					Name: "tinkoff",
+					Meta: entity.Meta{
+						"color:black",
+					},
+					Payload: entity.NewCardPayload(
+						"4377838623715638",
+						6, 29,
+						"MAGNUS CARLSEN",
+						737,
+					),
+				},
+				nil,
+			)
+
+		c := New(args(
+			t,
+			"show",
+			"card",
+			"tinkoff",
+		))
+
+		err := c.Run(ctx,
+			WithShow(show),
+			WithOutput(&output),
+		)
+
+		require.NoError(t, err)
+		assert.Equal(t, `meta:		"color:black"
+number:		4377838623715638
+expires:	6/29
+holder:		MAGNUS CARLSEN
+cvc:		737
+`, output.String())
+	})
 }
 
 func args(t testing.TB, a ...string) []string {
