@@ -42,7 +42,7 @@ func NewTextRecord(
 	}
 }
 
-// NewTextRecord constructs text data record
+// NewBinRecord constructs binary data record
 func NewBinRecord(
 	name string,
 	meta Meta,
@@ -50,6 +50,20 @@ func NewBinRecord(
 ) *Record {
 	return &Record{
 		Type:    RecordTypeBin,
+		Name:    name,
+		Meta:    meta,
+		Payload: &data,
+	}
+}
+
+// NewCardRecord constructs card data record
+func NewCardRecord(
+	name string,
+	meta Meta,
+	data CardPayload,
+) *Record {
+	return &Record{
+		Type:    RecordTypeCard,
 		Name:    name,
 		Meta:    meta,
 		Payload: &data,

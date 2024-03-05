@@ -10,4 +10,6 @@ const (
 	RecordTypeText RecordType = "text"
 	// RecordTypeBin is binary data
 	RecordTypeBin RecordType = "bin"
+	// RecordTypeCard is card data
+	RecordTypeCard RecordType = "card"
 )

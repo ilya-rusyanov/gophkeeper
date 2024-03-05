@@ -14,11 +14,12 @@
 
 ## In progress
 
-- [ ] store cards
 - [ ] show cards
 
 ## Done
 
+- [X] store cards
+- [X] client controller store card
 - [X] show binary
 - [X] client usecase show binary
 - [X] client controller show binary

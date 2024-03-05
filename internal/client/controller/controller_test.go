@@ -173,6 +173,43 @@ func TestController(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("store card", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		stor := mock.NewMockStorer(ctrl)
+
+		stor.EXPECT().Store(
+			gomock.Any(),
+			*entity.NewCardRecord(
+				"tinkoff",
+				entity.Meta{
+					"color:black",
+				},
+				entity.NewCardPayload(
+					"4377838623715638",
+					6, 29,
+					"MAGNUS CARLSEN",
+					737),
+			),
+		)
+
+		c := New(args(t,
+			"store",
+			"card",
+			"tinkoff",
+			"--meta", "color:black",
+			"-n", "4377838623715638",
+			"-e", "06/29",
+			"-o", "MAGNUS CARLSEN",
+			"-c", "737",
+		))
+
+		err := c.Run(ctx, WithStore(stor))
+
+		assert.NoError(t, err)
+	})
+
 	t.Run("listing", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()

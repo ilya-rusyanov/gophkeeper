@@ -74,6 +74,7 @@ func WithStore(s Storer) Opt {
 	return func(c *Controller) {
 		c.cli.Store.Auth.uc = s
 		c.cli.Store.Text.uc = s
+		c.cli.Store.Card.uc = s
 	}
 }
 
